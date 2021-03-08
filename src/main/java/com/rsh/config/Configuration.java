@@ -1,9 +1,7 @@
 package com.rsh.config;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Configuration {
+    /* members */
     private String dbUrl;
 
     private String dbUserName;
@@ -12,8 +10,11 @@ public class Configuration {
 
     private String dbDriver;
 
-    private final Map<String, MapperStatement> mapperStatements = new HashMap<>();
+    public static final String CONFIG_FILE_PATH = "easy-opm.properties";
 
+    public static final String MAPPER_FILE_PATH = "mapper";
+
+    /* methods */
     public String getDbUrl() {
         return dbUrl;
     }
@@ -44,9 +45,5 @@ public class Configuration {
 
     public void setDbDriver(String dbDriver) {
         this.dbDriver = dbDriver;
-    }
-
-    public Map<String, MapperStatement> getMapperStatements() {
-        return mapperStatements;
     }
 }

@@ -1,6 +1,6 @@
 package com.rsh.config;
 
-public class MapperStatement {
+public class MappedStatement {
     private String namespace;
 
     private String sourceId;
