@@ -6,6 +6,5 @@ public class InitConfigAndMapperTest {
     InitConfigAndMapper init;
     @Test
     public void testInit(){
-        init = new InitConfigAndMapper();
     }
 }
