@@ -1,4 +1,4 @@
-package com.rsh.config;
+package com.rsh.easy_opm.config;
 
 public class MappedStatement {
     private String namespace;

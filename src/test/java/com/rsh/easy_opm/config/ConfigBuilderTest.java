@@ -1,17 +1,16 @@
-package com.rsh.config;
+package com.rsh.easy_opm.config;
 
 import org.junit.Test;
 
 import java.util.Map;
 import java.util.Set;
 
-public class InitConfigAndMapperTest {
+public class ConfigBuilderTest {
     @Test
-    public void testInit() {
-        String dbSourceID = "mysql_developer";
-        InitConfigAndMapper init = new InitConfigAndMapper(dbSourceID);
+    public void test() {
+        ConfigBuilder init = new ConfigBuilder();
         Configuration config = init.getConfig();
-        Map<String, MappedStatement> mappers = init.getMapperStatements();
+        Map<String, MappedStatement> mappers = config.getMappedStatements();
 
         System.out.println(config);
         System.out.println();

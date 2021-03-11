@@ -1,4 +1,4 @@
-package com.rsh.config;
+package com.rsh.easy_opm.config;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -11,21 +11,15 @@ import java.net.URL;
 import java.util.*;
 import java.util.regex.*;
 
-public class InitConfigAndMapper {
+public class ConfigBuilder {
     private final Configuration config = new Configuration();
-    private final Map<String, MappedStatement> mapperStatements = new HashMap<>();
     private final Properties propertiesVar = new Properties();
 
     public Configuration getConfig() {
         return config;
     }
 
-    public Map<String, MappedStatement> getMapperStatements() {
-        return mapperStatements;
-    }
-
-    public InitConfigAndMapper(String dbID) {
-        config.setDbSourceID(dbID);
+    public ConfigBuilder(){
         // read a XML file and convert it to a Document
         Element root = loadXML();
 
@@ -38,12 +32,8 @@ public class InitConfigAndMapper {
         config.checkConfig();
     }
 
-    public InitConfigAndMapper() {
-    }
-
-
     private Element loadXML() {
-        URL resource = InitConfigAndMapper.class.getClassLoader().getResource(Configuration.EASYOPM_CONFIG_PATH);
+        URL resource = ConfigBuilder.class.getClassLoader().getResource(Configuration.EASYOPM_CONFIG_PATH);
         SAXReader reader = new SAXReader();
         Document document = null;
 
@@ -57,7 +47,7 @@ public class InitConfigAndMapper {
 
     private void parseProperties(Element ele) {
         String propertyPath = ele.attributeValue("resource");
-        InputStream configIn = InitConfigAndMapper.class.getClassLoader().getResourceAsStream(propertyPath);
+        InputStream configIn = ConfigBuilder.class.getClassLoader().getResourceAsStream(propertyPath);
         try {
             propertiesVar.load(configIn);
         } catch (IOException e) {
@@ -66,17 +56,18 @@ public class InitConfigAndMapper {
     }
 
     private void parseEnvironments(Element ele) {
+        String defaultID = ele.attributeValue("default");
         List<Element> environments = ele.elements("environment");
         Boolean dbSourceIdMatched = false;
         for (Element cur :
                 environments) {
             String id = cur.attributeValue("id");
-            if (id.equals(config.getDbSourceID())) {
+            if (id.equals(defaultID)) {
                 dbSourceIdMatched = true;
                 parseDataSource(cur.element("dataSource"));
             }
         }
-        assert dbSourceIdMatched : "Database source ID is incorrect";
+        assert dbSourceIdMatched : "Default database source ID is not matched";
     }
 
     private void parseDataSource(Element ele) {
@@ -93,6 +84,7 @@ public class InitConfigAndMapper {
             Matcher m = r.matcher(value);
             if (m.find()) {
 //                System.out.println("Try to replace [" + value + "] to [" + propertiesVar.getProperty(m.group(1)) + "]");
+                assert propertiesVar.containsKey(m.group(1)) : m.group(1) + " does not exist in Properties File";
                 value = propertiesVar.getProperty(m.group(1));
             }
             propertiesMap.put(name, value);
@@ -114,7 +106,7 @@ public class InitConfigAndMapper {
     }
 
     public void parseMapperFile(String path) {
-        URL resource = InitConfigAndMapper.class.getClassLoader().getResource(path);
+        URL resource = ConfigBuilder.class.getClassLoader().getResource(path);
         SAXReader reader = new SAXReader();
         Document document = null;
 
@@ -140,7 +132,7 @@ public class InitConfigAndMapper {
             mappedStatement.setSql(sql);
 
             // register the mapper into mapperStatments
-            this.mapperStatements.put(sourceId, mappedStatement);
+            config.getMappedStatements().put(sourceId, mappedStatement);
         }
     }
 }
