@@ -5,12 +5,10 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
-
 import java.util.regex.*;
 
 public class InitConfigAndMapper {
@@ -29,7 +27,7 @@ public class InitConfigAndMapper {
     public InitConfigAndMapper(String dbID) {
         config.setDbSourceID(dbID);
         // read a XML file and convert it to a Document
-        Element root = readXML();
+        Element root = loadXML();
 
         // parse elements
         parseProperties(root.element("properties"));
@@ -44,13 +42,13 @@ public class InitConfigAndMapper {
     }
 
 
-    private Element readXML() {
-        URL resources = InitConfigAndMapper.class.getClassLoader().getResource(Configuration.EASYOPM_CONFIG_PATH);
+    private Element loadXML() {
+        URL resource = InitConfigAndMapper.class.getClassLoader().getResource(Configuration.EASYOPM_CONFIG_PATH);
         SAXReader reader = new SAXReader();
         Document document = null;
 
         try {
-            document = reader.read(resources);
+            document = reader.read(resource);
         } catch (DocumentException e) {
             e.printStackTrace();
         }
@@ -58,7 +56,7 @@ public class InitConfigAndMapper {
     }
 
     private void parseProperties(Element ele) {
-        String propertyPath = ele.attributeValue("resources");
+        String propertyPath = ele.attributeValue("resource");
         InputStream configIn = InitConfigAndMapper.class.getClassLoader().getResourceAsStream(propertyPath);
         try {
             propertiesVar.load(configIn);
@@ -69,13 +67,16 @@ public class InitConfigAndMapper {
 
     private void parseEnvironments(Element ele) {
         List<Element> environments = ele.elements("environment");
+        Boolean dbSourceIdMatched = false;
         for (Element cur :
                 environments) {
             String id = cur.attributeValue("id");
-            if(id.equals(config.getDbSourceID())) {
+            if (id.equals(config.getDbSourceID())) {
+                dbSourceIdMatched = true;
                 parseDataSource(cur.element("dataSource"));
             }
         }
+        assert dbSourceIdMatched : "Database source ID is incorrect";
     }
 
     private void parseDataSource(Element ele) {
@@ -86,11 +87,13 @@ public class InitConfigAndMapper {
                 properties) {
             String name = cur.attributeValue("name");
             String value = cur.attributeValue("value");
+//            System.out.println("Parsing: Name[" + name + "] Value[" + value + "]");
             String pattern = "\\$\\{(.*)\\}";
             Pattern r = Pattern.compile(pattern);
             Matcher m = r.matcher(value);
-            if (m.find()){
-                value = propertiesVar.getProperty(m.group(0));
+            if (m.find()) {
+//                System.out.println("Try to replace [" + value + "] to [" + propertiesVar.getProperty(m.group(1)) + "]");
+                value = propertiesVar.getProperty(m.group(1));
             }
             propertiesMap.put(name, value);
         }
@@ -102,35 +105,42 @@ public class InitConfigAndMapper {
     }
 
     private void parseMappers(Element ele) {
-        URL resources = InitConfigAndMapper.class.getClassLoader().getResource(Configuration.MAPPER_FILE_PATH);
-        assert resources != null;
-        File mappers = new File(resources.getFile());
-        assert mappers.isDirectory();
-        File[] listFiles = mappers.listFiles();
-        for (File file : listFiles) {
-            parseMapperFile(file);
+        List<Element> environments = ele.elements("mapper");
+        for (Element cur :
+                environments) {
+            String resource = cur.attributeValue("resource");
+            parseMapperFile(resource);
         }
     }
 
-    public void parseMapperFile(File file) {
+    public void parseMapperFile(String path) {
+        URL resource = InitConfigAndMapper.class.getClassLoader().getResource(path);
+        SAXReader reader = new SAXReader();
+        Document document = null;
 
-        // parse Document
-//        Element node = document.getRootElement();
-//        String namespace = node.attribute("namespace").getData().toString();
-//        List<Element> selects = node.elements("select");
-//        for (Element element : selects) {
-//            MappedStatement mappedStatement = new MappedStatement();
-//            String id = element.attribute("id").getData().toString();
-//            String resultType = element.attribute("resultType").getData().toString();
-//            String sql = element.getData().toString();
-//            String sourceId = namespace + "." + id;
-//            mappedStatement.setSourceId(sourceId);
-//            mappedStatement.setResultType(resultType);
-//            mappedStatement.setSql(sql);
-//            mappedStatement.setNamespace(namespace);
-//
-//            // register the mapper into mapperStatments
-//            this.mapperStatements.put(sourceId, mappedStatement);
-//        }
+        try {
+            document = reader.read(resource);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+
+        Element node = document.getRootElement();
+        String namespace = node.attributeValue("namespace");
+        List<Element> selects = node.elements("select");
+        for (Element element : selects) {
+            String id = element.attributeValue("id");
+            String sourceId = namespace + "." + id;
+            String resultType = element.attributeValue("resultType");
+            String sql = element.getText();
+
+            MappedStatement mappedStatement = new MappedStatement();
+            mappedStatement.setNamespace(namespace);
+            mappedStatement.setSourceId(sourceId);
+            mappedStatement.setResultType(resultType);
+            mappedStatement.setSql(sql);
+
+            // register the mapper into mapperStatments
+            this.mapperStatements.put(sourceId, mappedStatement);
+        }
     }
 }

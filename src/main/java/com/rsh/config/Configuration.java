@@ -15,10 +15,6 @@ public class Configuration {
     private String dbConnType;
 
     /* constant */
-    public static final String CONFIG_FILE_PATH = "easy-opm.properties";
-
-    public static final String MAPPER_FILE_PATH = "mapper";
-
     public static final String EASYOPM_CONFIG_PATH = "easy-opm.xml";
 
     /* methods */
@@ -71,12 +67,24 @@ public class Configuration {
         this.dbConnType = dbConnType;
     }
 
-    public void checkConfig(){
-        assert !dbSourceID.isEmpty();
-        assert !dbConnType.isEmpty();
-        assert !dbDriver.isEmpty();
-        assert !dbUrl.isEmpty();
-        assert !dbUserName.isEmpty();
-        assert !dbPassword.isEmpty();
+    public void checkConfig() {
+        assert dbSourceID != null : "Fail to get dbSourceID";
+        assert dbConnType != null : "Fail to get dbConnType";
+        assert dbDriver != null : "Fail to get dbDriver";
+        assert dbUrl != null : "Fail to get dbUrl";
+        assert dbUserName != null : "Fail to get dbUserName";
+        assert dbPassword != null : "Fail to get dbPassword";
+    }
+
+    @Override
+    public String toString() {
+        return "Configuration{" +
+                "dbSourceID='" + dbSourceID + '\'' +
+                ", dbUrl='" + dbUrl + '\'' +
+                ", dbUserName='" + dbUserName + '\'' +
+                ", dbPassword='" + dbPassword + '\'' +
+                ", dbDriver='" + dbDriver + '\'' +
+                ", dbConnType='" + dbConnType + '\'' +
+                '}';
     }
 }

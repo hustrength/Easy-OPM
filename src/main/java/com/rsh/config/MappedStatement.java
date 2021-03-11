@@ -40,4 +40,14 @@ public class MappedStatement {
     public void setResultType(String resultType) {
         this.resultType = resultType;
     }
+
+    @Override
+    public String toString() {
+        return "MappedStatement{" +
+                "namespace='" + namespace + '\'' +
+                ", sourceId='" + sourceId + '\'' +
+                ", sql='" + sql + '\'' +
+                ", resultType='" + resultType + '\'' +
+                '}';
+    }
 }

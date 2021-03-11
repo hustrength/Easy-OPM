@@ -1,0 +1,24 @@
+<mapper namespace="com.rsh.mapper.UserMapper">
+
+    <select id="selectByPrimaryKey" resultType="com.kami.model.User">
+        select
+        id,
+        nick_name AS nickName,
+        real_name AS realName,
+        sex,
+        age
+        from user
+        where id = ?
+    </select>
+
+    <select id="selectAll" resultType="com.kami.model.User">
+        select
+        id,
+        nick_name AS nickName,
+        real_name AS realName,
+        sex,
+        age
+        from user
+    </select>
+
+</mapper>
