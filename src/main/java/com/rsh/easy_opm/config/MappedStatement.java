@@ -9,6 +9,8 @@ public class MappedStatement {
 
     private String resultType;
 
+    private String commandType;
+
     public String getNamespace() {
         return namespace;
     }
@@ -39,6 +41,14 @@ public class MappedStatement {
 
     public void setResultType(String resultType) {
         this.resultType = resultType;
+    }
+
+    public String getCommandType() {
+        return commandType;
+    }
+
+    public void setCommandType(String commandType) {
+        this.commandType = commandType;
     }
 
     @Override

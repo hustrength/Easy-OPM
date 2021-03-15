@@ -22,20 +22,20 @@ public class MapperProxy<T> implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        //如果是Object本身的方法不增强
+        // do not enhance the method if this is Object Class
         if (Object.class.equals(method.getDeclaringClass())) {
             return method.invoke(this, args);
         }
 
-        //获取方法的返回参数class对象
         Class<T> returnType = (Class<T>) method.getReturnType();
         Object ret = null;
 
-        //根据不同的返回参数类型调用不同的SqlSession不同的方法
+        // invoke different methods in SqlSession according to different return types
+        String sourceID = mapperInterface.getName() + "." + method.getName();
         if (isCollection(returnType)) {
-//            ret = sqlSession.selectList(mapperInterface.getName() + "." + method.getName(), args);
+            ret = sqlSession.selectList(sourceID, args);
         } else {
-//            ret = sqlSession.selectOne(mapperInterface.getName() + "." + method.getName(), args);
+            ret = sqlSession.selectOne(sourceID, args);
         }
         return ret;
     }

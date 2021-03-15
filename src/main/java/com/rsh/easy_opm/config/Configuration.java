@@ -16,8 +16,6 @@ public class Configuration {
 
     private String dbDriver;
 
-    private String dbConnType;
-
     /* constant */
     public static final String EASYOPM_CONFIG_PATH = "easy-opm.xml";
 
@@ -29,8 +27,13 @@ public class Configuration {
         return MapperProxyFactory.getMapperProxy(sqlSession, type);
     }
 
+    public MappedStatement queryMappedStatement(String sourceID){
+        MappedStatement result = this.mappedStatements.get(sourceID);
+        assert result !=null : "Source ID[" + sourceID + "] is invalid";
+        return result;
+    }
+
     public void checkConfig() {
-        assert dbConnType != null : "Fail to get dbConnType";
         assert dbDriver != null : "Fail to get dbDriver";
         assert dbUrl != null : "Fail to get dbUrl";
         assert dbUserName != null : "Fail to get dbUserName";
@@ -44,7 +47,6 @@ public class Configuration {
                 ", dbUserName='" + dbUserName + '\'' +
                 ", dbPassword='" + dbPassword + '\'' +
                 ", dbDriver='" + dbDriver + '\'' +
-                ", dbConnType='" + dbConnType + '\'' +
                 '}';
     }
 
@@ -79,14 +81,6 @@ public class Configuration {
 
     public void setDbDriver(String dbDriver) {
         this.dbDriver = dbDriver;
-    }
-
-    public String getDbConnType() {
-        return dbConnType;
-    }
-
-    public void setDbConnType(String dbConnType) {
-        this.dbConnType = dbConnType;
     }
 
     public Map<String, MappedStatement> getMappedStatements() {

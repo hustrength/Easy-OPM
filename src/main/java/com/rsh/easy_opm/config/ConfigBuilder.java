@@ -15,6 +15,7 @@ public class ConfigBuilder {
     private final Configuration config = new Configuration();
     private final Properties propertiesVar = new Properties();
 
+
     public Configuration getConfig() {
         return config;
     }
@@ -84,12 +85,11 @@ public class ConfigBuilder {
             Matcher m = r.matcher(value);
             if (m.find()) {
 //                System.out.println("Try to replace [" + value + "] to [" + propertiesVar.getProperty(m.group(1)) + "]");
-                assert propertiesVar.containsKey(m.group(1)) : m.group(1) + " does not exist in Properties File";
+                assert propertiesVar.containsKey(m.group(1)) : value + " does not exist in Properties File";
                 value = propertiesVar.getProperty(m.group(1));
             }
             propertiesMap.put(name, value);
         }
-        config.setDbConnType(type);
         config.setDbDriver(propertiesMap.get("driver"));
         config.setDbUrl(propertiesMap.get("url"));
         config.setDbUserName(propertiesMap.get("username"));
@@ -118,21 +118,30 @@ public class ConfigBuilder {
 
         Element node = document.getRootElement();
         String namespace = node.attributeValue("namespace");
-        List<Element> selects = node.elements("select");
-        for (Element element : selects) {
-            String id = element.attributeValue("id");
-            String sourceId = namespace + "." + id;
-            String resultType = element.attributeValue("resultType");
-            String sql = element.getText();
 
-            MappedStatement mappedStatement = new MappedStatement();
-            mappedStatement.setNamespace(namespace);
-            mappedStatement.setSourceId(sourceId);
-            mappedStatement.setResultType(resultType);
-            mappedStatement.setSql(sql);
+        for (SqlCommandType cur :
+                SqlCommandType.values()) {
+            String commandType = cur.name().toLowerCase(Locale.ROOT);
 
-            // register the mapper into mapperStatments
-            config.getMappedStatements().put(sourceId, mappedStatement);
+            List<Element> commands = node.elements(commandType);
+            for (Element element : commands) {
+                String id = element.attributeValue("id");
+                String sourceId = namespace + "." + id;
+                String resultType = element.attributeValue("resultType");
+                String sql = element.getText();
+
+                MappedStatement mappedStatement = new MappedStatement();
+                mappedStatement.setNamespace(namespace);
+                mappedStatement.setSourceId(sourceId);
+                mappedStatement.setResultType(resultType);
+                mappedStatement.setSql(sql);
+                mappedStatement.setCommandType(commandType);
+
+                // register the mapper into mapperStatments
+                config.getMappedStatements().put(sourceId, mappedStatement);
+            }
         }
+
+
     }
 }
