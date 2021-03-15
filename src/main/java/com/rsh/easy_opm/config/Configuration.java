@@ -1,6 +1,7 @@
 package com.rsh.easy_opm.config;
 
 import com.rsh.easy_opm.binding.MapperProxyFactory;
+import com.rsh.easy_opm.error.AssertError;
 import com.rsh.easy_opm.sqlsession.SqlSession;
 
 import java.util.HashMap;
@@ -27,17 +28,17 @@ public class Configuration {
         return MapperProxyFactory.getMapperProxy(sqlSession, type);
     }
 
-    public MappedStatement queryMappedStatement(String sourceID){
+    public MappedStatement queryMappedStatement(String sourceID) {
         MappedStatement result = this.mappedStatements.get(sourceID);
-        assert result !=null : "Source ID[" + sourceID + "] is invalid";
+        AssertError.notMatchedError(result != null, "Mapper ID", sourceID);
         return result;
     }
 
     public void checkConfig() {
-        assert dbDriver != null : "Fail to get dbDriver";
-        assert dbUrl != null : "Fail to get dbUrl";
-        assert dbUserName != null : "Fail to get dbUserName";
-        assert dbPassword != null : "Fail to get dbPassword";
+        AssertError.notFoundError(dbDriver != null, "dbDriver", Configuration.EASYOPM_CONFIG_PATH);
+        AssertError.notFoundError(dbUrl != null, "dbUrl", Configuration.EASYOPM_CONFIG_PATH);
+        AssertError.notFoundError(dbUserName != null, "dbUserName", Configuration.EASYOPM_CONFIG_PATH);
+        AssertError.notFoundError(dbPassword != null, "dbPassword", Configuration.EASYOPM_CONFIG_PATH);
     }
 
     @Override

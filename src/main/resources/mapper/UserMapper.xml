@@ -1,21 +1,25 @@
 <mapper namespace="com.rsh.easy_opm.UserMapper">
+    <resultMap id="ResultUser">
+        <result column="nick_name" property="nickName"/>
+        <result column="real_name" property="realName"/>
+    </resultMap>
 
-    <select id="selectByPrimaryKey" resultType="com.rsh.easy_opm.User">
+    <select id="selectByPrimaryKey" resultType="com.rsh.easy_opm.User" resultMap="ResultUser">
         select
             id,
-            nickName,
-            realName,
+            nick_name,
+            real_name,
             sex,
             age
         from user
         where id = ?
     </select>
 
-    <select id="selectAll" resultType="com.rsh.easy_opm.User">
+    <select id="selectAll" resultType="com.rsh.easy_opm.User" resultMap="ResultUser">
         select
             id,
-            nickName,
-            realName,
+            nick_name,
+            real_name,
             sex,
             age
         from user

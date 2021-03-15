@@ -22,7 +22,7 @@ public class TestEasy_OPM {
         }
         System.out.println();
 
-        System.out.println("userMapper.selecetByPrimaryKey(2):");
+        System.out.println("userMapper.selecetByPrimaryKey():");
         System.out.println(userMapper.selectByPrimaryKey(2));
     }
 }

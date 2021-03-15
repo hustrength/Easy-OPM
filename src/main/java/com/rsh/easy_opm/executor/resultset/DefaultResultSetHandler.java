@@ -21,7 +21,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     public <E> List<E> handleResultSet(ResultSet resultSet) throws SQLException {
         List<E> ret = new ArrayList<>();
         while (resultSet.next()) {
-            E entityClass = (E) ReflectionUtil.convertToBean(mappedStatement.getResultType(), resultSet);
+            E entityClass = (E) ReflectionUtil.convertToBean(mappedStatement, resultSet);
             if (entityClass != null)
                 ret.add(entityClass);
         }

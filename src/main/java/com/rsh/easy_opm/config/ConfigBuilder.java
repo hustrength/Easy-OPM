@@ -1,5 +1,6 @@
 package com.rsh.easy_opm.config;
 
+import com.rsh.easy_opm.error.AssertError;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -20,7 +21,7 @@ public class ConfigBuilder {
         return config;
     }
 
-    public ConfigBuilder(){
+    public ConfigBuilder() {
         // read a XML file and convert it to a Document
         Element root = loadXML();
 
@@ -59,7 +60,7 @@ public class ConfigBuilder {
     private void parseEnvironments(Element ele) {
         String defaultID = ele.attributeValue("default");
         List<Element> environments = ele.elements("environment");
-        Boolean dbSourceIdMatched = false;
+        boolean dbSourceIdMatched = false;
         for (Element cur :
                 environments) {
             String id = cur.attributeValue("id");
@@ -68,7 +69,7 @@ public class ConfigBuilder {
                 parseDataSource(cur.element("dataSource"));
             }
         }
-        assert dbSourceIdMatched : "Default database source ID is not matched";
+        AssertError.notMatchedError(dbSourceIdMatched, "Default database source ID", defaultID);
     }
 
     private void parseDataSource(Element ele) {
@@ -85,7 +86,7 @@ public class ConfigBuilder {
             Matcher m = r.matcher(value);
             if (m.find()) {
 //                System.out.println("Try to replace [" + value + "] to [" + propertiesVar.getProperty(m.group(1)) + "]");
-                assert propertiesVar.containsKey(m.group(1)) : value + " does not exist in Properties File";
+                AssertError.notFoundError(propertiesVar.containsKey(m.group(1)), value, "Properties File");
                 value = propertiesVar.getProperty(m.group(1));
             }
             propertiesMap.put(name, value);
@@ -116,21 +117,28 @@ public class ConfigBuilder {
             e.printStackTrace();
         }
 
-        Element node = document.getRootElement();
-        String namespace = node.attributeValue("namespace");
+        Element rootNode = document.getRootElement();
+        String namespace = rootNode.attributeValue("namespace");
+        ResultMapBuilder resultMapBuilder = new ResultMapBuilder(rootNode);
 
         for (SqlCommandType cur :
                 SqlCommandType.values()) {
             String commandType = cur.name().toLowerCase(Locale.ROOT);
 
-            List<Element> commands = node.elements(commandType);
+            List<Element> commands = rootNode.elements(commandType);
             for (Element element : commands) {
                 String id = element.attributeValue("id");
                 String sourceId = namespace + "." + id;
                 String resultType = element.attributeValue("resultType");
                 String sql = element.getText();
+                String resultMap = element.attributeValue("resultMap");
 
                 MappedStatement mappedStatement = new MappedStatement();
+                // use resultMap when resultType is not given
+                if (resultMap != null){
+                    mappedStatement.setResultMap(resultMapBuilder.getResultMap(resultMap));
+                }
+
                 mappedStatement.setNamespace(namespace);
                 mappedStatement.setSourceId(sourceId);
                 mappedStatement.setResultType(resultType);
@@ -141,7 +149,5 @@ public class ConfigBuilder {
                 config.getMappedStatements().put(sourceId, mappedStatement);
             }
         }
-
-
     }
 }

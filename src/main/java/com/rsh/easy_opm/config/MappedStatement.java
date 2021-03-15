@@ -1,5 +1,8 @@
 package com.rsh.easy_opm.config;
 
+import java.util.Map;
+import java.util.Set;
+
 public class MappedStatement {
     private String namespace;
 
@@ -10,6 +13,8 @@ public class MappedStatement {
     private String resultType;
 
     private String commandType;
+
+    private Map<String, String> resultMap;
 
     public String getNamespace() {
         return namespace;
@@ -51,6 +56,14 @@ public class MappedStatement {
         this.commandType = commandType;
     }
 
+    public Map<String, String> getResultMap() {
+        return resultMap;
+    }
+
+    public void setResultMap(Map<String, String> resultMap) {
+        this.resultMap = resultMap;
+    }
+
     @Override
     public String toString() {
         return "MappedStatement{" +
@@ -58,6 +71,19 @@ public class MappedStatement {
                 ", sourceId='" + sourceId + '\'' +
                 ", sql='" + sql + '\'' +
                 ", resultType='" + resultType + '\'' +
+                "\n, resultMap={" + printResultMap() + '}' +
                 '}';
+    }
+
+    public String printResultMap(){
+        if (this.resultMap == null) return null;
+        Set<String> keySet= this.resultMap.keySet();
+        StringBuffer resultString = new StringBuffer();
+        for (String key :
+                keySet) {
+            resultString.append('(' + key + ", " + this.resultMap.get(key) + ") ");
+        }
+        resultString.trimToSize();
+        return resultString.toString().trim();
     }
 }
