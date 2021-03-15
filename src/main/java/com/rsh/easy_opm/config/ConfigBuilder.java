@@ -73,19 +73,16 @@ public class ConfigBuilder {
     }
 
     private void parseDataSource(Element ele) {
-        String type = ele.attributeValue("type");
         List<Element> properties = ele.elements("property");
         Map<String, String> propertiesMap = new HashMap<>();
         for (Element cur :
                 properties) {
             String name = cur.attributeValue("name");
             String value = cur.attributeValue("value");
-//            System.out.println("Parsing: Name[" + name + "] Value[" + value + "]");
-            String pattern = "\\$\\{(.*)\\}";
+            String pattern = "\\$\\{([^\\#\\{\\}]*)\\}";
             Pattern r = Pattern.compile(pattern);
             Matcher m = r.matcher(value);
             if (m.find()) {
-//                System.out.println("Try to replace [" + value + "] to [" + propertiesVar.getProperty(m.group(1)) + "]");
                 AssertError.notFoundError(propertiesVar.containsKey(m.group(1)), value, "Properties File");
                 value = propertiesVar.getProperty(m.group(1));
             }
@@ -117,8 +114,12 @@ public class ConfigBuilder {
             e.printStackTrace();
         }
 
+        AssertError.notFoundError(document != null, path);
         Element rootNode = document.getRootElement();
         String namespace = rootNode.attributeValue("namespace");
+        AssertError.notFoundError(namespace != null, "namespace", "mapper");
+
+        // find all resultMap nodes in mapper
         ResultMapBuilder resultMapBuilder = new ResultMapBuilder(rootNode);
 
         for (SqlCommandType cur :
@@ -133,12 +134,29 @@ public class ConfigBuilder {
                 String sql = element.getText();
                 String resultMap = element.attributeValue("resultMap");
 
+                AssertError.notFoundError(id != null, "id", "mapper");
+                AssertError.notFoundError(sql != null, "sql", "mapper");
+
                 MappedStatement mappedStatement = new MappedStatement();
                 // use resultMap when resultType is not given
-                if (resultMap != null){
+                if (resultMap != null) {
                     mappedStatement.setResultMap(resultMapBuilder.getResultMap(resultMap));
                 }
 
+                // parse and bind parameters in SQL
+                List<String> paraOrder = parseParameters(sql);
+
+                String paraType = element.attributeValue("parameterType");
+
+                // when paraType is not given, the paraOrder must be null
+                if (paraType == null)
+                    AssertError.notMatchedError(paraOrder == null, "parameterType", paraType, "given parameters", "not null", sourceId);
+
+                // replace all "#{...}" with "?" in SQL
+                sql = sql.replaceAll("#\\{([^\\#\\{\\}]*)\\}", "?");
+
+                mappedStatement.setParaOrder(paraOrder);
+                mappedStatement.setParaType(paraType);
                 mappedStatement.setNamespace(namespace);
                 mappedStatement.setSourceId(sourceId);
                 mappedStatement.setResultType(resultType);
@@ -149,5 +167,16 @@ public class ConfigBuilder {
                 config.getMappedStatements().put(sourceId, mappedStatement);
             }
         }
+    }
+
+    private List<String> parseParameters(String sql) {
+        List<String> paraOrder = new ArrayList<>();
+        String pattern = "#\\{([^\\#\\{\\}]*)\\}";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(sql);
+        while (m.find()) {
+            paraOrder.add(m.group(1));
+        }
+        return paraOrder.size() != 0 ? paraOrder : null;
     }
 }

@@ -10,5 +10,5 @@ public interface StatementHandler {
     PreparedStatement prepare(Connection connection) throws SQLException;
 
     // execute SQL
-    ResultSet query(PreparedStatement statement);
+    ResultSet execute(PreparedStatement statement);
 }

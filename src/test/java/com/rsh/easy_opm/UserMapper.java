@@ -6,5 +6,8 @@ public interface UserMapper {
     User selectByPrimaryKey(int id);
 
     List<User> selectAll();
-    User fsdf();
+
+    void insertOne(User user);
+
+    void deleteByPrimaryKey(int id);
 }

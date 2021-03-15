@@ -1,6 +1,7 @@
 package com.rsh.easy_opm.reflection;
 
 import com.rsh.easy_opm.config.MappedStatement;
+import com.rsh.easy_opm.error.AssertError;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
@@ -35,7 +36,7 @@ public class ReflectionUtil {
                     case "char":
                         field.set(entity, resultSet.getByte(mappedName));
                     default:
-                        assert false : "Type[" + field.getType().getSimpleName() + "] is not supported";
+                        AssertError.notSupported("fieldType", field.getType().getSimpleName());
                 }
             }
             return entity;

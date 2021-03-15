@@ -19,20 +19,20 @@ public class BaseExecutor implements Executor{
     }
 
     @Override
-    public <E> List<E> query(MappedStatement mappedStatement, Object[] parameter) throws SQLException {
+    public <E> List<E> query(MappedStatement ms, Object[] parameter) throws SQLException {
         // Instantiate StatementHandler Class and get PreparedStatement from conn
-        StatementHandler statementHandler = new DefaultStatementHandler(mappedStatement);
+        StatementHandler statementHandler = new DefaultStatementHandler(ms);
         PreparedStatement preparedStatement = statementHandler.prepare(conn);
 
         // Instantiate ParameterHandler Class and set parameters
-        ParameterHandler parameterHandler = new DefaultParameterHandler(parameter);
+        ParameterHandler parameterHandler = new DefaultParameterHandler(ms.getParaType(), ms.getParaOrder(), parameter);
         parameterHandler.setParameters(preparedStatement);
 
         // Execute SQL and get ResultSet
-        ResultSet resultSet = statementHandler.query(preparedStatement);
+        ResultSet resultSet = statementHandler.execute(preparedStatement);
 
         // Instantiate ResultSetHandler Class and convert result to POJO
-        ResultSetHandler resultSetHandler = new DefaultResultSetHandler(mappedStatement);
+        ResultSetHandler resultSetHandler = new DefaultResultSetHandler(ms);
 
         return resultSetHandler.handleResultSet(resultSet);
     }

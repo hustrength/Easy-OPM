@@ -19,6 +19,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     @SuppressWarnings("unchecked")
     @Override
     public <E> List<E> handleResultSet(ResultSet resultSet) throws SQLException {
+        if (resultSet == null)
+            return null;
         List<E> ret = new ArrayList<>();
         while (resultSet.next()) {
             E entityClass = (E) ReflectionUtil.convertToBean(mappedStatement, resultSet);

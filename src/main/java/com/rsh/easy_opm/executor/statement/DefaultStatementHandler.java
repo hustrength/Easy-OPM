@@ -20,9 +20,17 @@ public class DefaultStatementHandler implements StatementHandler{
     }
 
     @Override
-    public ResultSet query(PreparedStatement statement) {
+    public ResultSet execute(PreparedStatement statement) {
         try {
-            return statement.executeQuery();
+            switch (mappedStatment.getCommandType()){
+                case "select":
+                    return statement.executeQuery();
+                case "update":
+                case "insert":
+                case "delete":
+                    statement.executeUpdate();
+                    return null;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

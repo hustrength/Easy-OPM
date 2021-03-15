@@ -4,7 +4,7 @@
         <result column="real_name" property="realName"/>
     </resultMap>
 
-    <select id="selectByPrimaryKey" resultType="com.rsh.easy_opm.User" resultMap="ResultUser">
+    <select id="selectByPrimaryKey" parameterType="basic" resultType="com.rsh.easy_opm.User" resultMap="ResultUser">
         select
             id,
             nick_name,
@@ -12,7 +12,7 @@
             sex,
             age
         from user
-        where id = ?
+        where id = #{id};
     </select>
 
     <select id="selectAll" resultType="com.rsh.easy_opm.User" resultMap="ResultUser">
@@ -22,7 +22,17 @@
             real_name,
             sex,
             age
-        from user
+        from user;
     </select>
+
+    <insert id="insertOne" parameterType="com.rsh.easy_opm.User">
+        insert into user
+            values (#{id}, #{nickName}, #{realName}, #{sex}, #{age});
+    </insert>
+
+    <insert id="deleteByPrimaryKey" parameterType="basic">
+        delete from user
+        where id=#{id};
+    </insert>
 
 </mapper>

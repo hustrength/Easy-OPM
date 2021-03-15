@@ -1,9 +1,11 @@
 package com.rsh.easy_opm.config;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class MappedStatement {
+
     private String namespace;
 
     private String sourceId;
@@ -15,6 +17,10 @@ public class MappedStatement {
     private String commandType;
 
     private Map<String, String> resultMap;
+
+    private List<String> paraOrder;
+
+    private String paraType;
 
     public String getNamespace() {
         return namespace;
@@ -64,6 +70,22 @@ public class MappedStatement {
         this.resultMap = resultMap;
     }
 
+    public List<String> getParaOrder() {
+        return paraOrder;
+    }
+
+    public void setParaOrder(List<String> paraOrder) {
+        this.paraOrder = paraOrder;
+    }
+
+    public String getParaType() {
+        return paraType;
+    }
+
+    public void setParaType(String paraType) {
+        this.paraType = paraType;
+    }
+
     @Override
     public String toString() {
         return "MappedStatement{" +
@@ -83,7 +105,6 @@ public class MappedStatement {
                 keySet) {
             resultString.append('(' + key + ", " + this.resultMap.get(key) + ") ");
         }
-        resultString.trimToSize();
         return resultString.toString().trim();
     }
 }
