@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DefaultStatementHandler implements StatementHandler{
-    private MappedStatement mappedStatment;
+    private final MappedStatement mappedStatment;
 
     public DefaultStatementHandler(MappedStatement mappedStatment) {
         this.mappedStatment = mappedStatment;

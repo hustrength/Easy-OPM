@@ -18,7 +18,11 @@ public class MappedStatement {
 
     private Map<String, String> resultMap;
 
-    private List<String> paraOrder;
+    // symbol #{...}
+    private List<String> preparedParamOrder;
+
+    // symbol ${...}
+    private List<String> replacedParamOrder;
 
     private String paraType;
 
@@ -70,12 +74,20 @@ public class MappedStatement {
         this.resultMap = resultMap;
     }
 
-    public List<String> getParaOrder() {
-        return paraOrder;
+    public List<String> getPreparedParamOrder() {
+        return preparedParamOrder;
     }
 
-    public void setParaOrder(List<String> paraOrder) {
-        this.paraOrder = paraOrder;
+    public void setPreparedParamOrder(List<String> preparedParamOrder) {
+        this.preparedParamOrder = preparedParamOrder;
+    }
+
+    public List<String> getReplacedParamOrder() {
+        return replacedParamOrder;
+    }
+
+    public void setReplacedParamOrder(List<String> replacedParamOrder) {
+        this.replacedParamOrder = replacedParamOrder;
     }
 
     public String getParaType() {

@@ -79,7 +79,7 @@ public class ConfigBuilder {
                 properties) {
             String name = cur.attributeValue("name");
             String value = cur.attributeValue("value");
-            String pattern = "\\$\\{([^\\#\\{\\}]*)\\}";
+            String pattern = "\\$\\{([^#{}]*)}";
             Pattern r = Pattern.compile(pattern);
             Matcher m = r.matcher(value);
             if (m.find()) {

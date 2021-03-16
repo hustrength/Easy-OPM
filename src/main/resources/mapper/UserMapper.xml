@@ -44,7 +44,7 @@
             real_name,
             age
         from user
-        where id > #{idMin} and sex = #{gender}
+        where ${column1} > #{value1} and ${column2} > #{value2} and ${column3} = #{value3};
     </select>
 
     <update id="updateOne" parameterType="user">

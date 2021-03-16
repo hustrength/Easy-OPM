@@ -1,0 +1,40 @@
+package com.rsh.easy_opm.executor.parameter;
+
+import com.rsh.easy_opm.error.AssertError;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class ReplacedParameterHandler implements ParameterHandler {
+    String sql;
+
+    public ReplacedParameterHandler(String sql) {
+        this.sql = sql;
+    }
+
+    public String getSql() {
+        return sql;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void setParameters(String paramType, List<String> paramOrder, Object[] parameter) throws SQLException {
+        // when paramOrder is null, there is no replaced params
+        if (paramOrder == null)
+            return;
+        // when paramOrder is not null, the paramType must be map
+        AssertError.notMatchedError(paramType.equals("map"), "Using replaced params ${...}, paramType", paramType, "specified paramType", "map");
+
+        CheckMapParameter.check(paramOrder, parameter);
+        Map<String, Object> map = (Map<String, Object>) parameter[0];
+        String pattern = "\\$\\{([^#{}]*)}";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(sql);
+        while (m.find()) {
+            sql = sql.replaceFirst(pattern, String.valueOf(map.get(m.group(1))));
+        }
+    }
+}

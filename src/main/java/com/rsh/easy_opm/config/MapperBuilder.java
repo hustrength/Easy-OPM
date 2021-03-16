@@ -62,16 +62,18 @@ public class MapperBuilder {
                     mappedStatement.setResultMap(resultMapBuilder.getResultMap(resultMap));
                 }
 
-                // get parameterType Attr and bind Paras in SQL
-                List<String> paraOrder = parseParameters(sql);
+                // parse Prepared Params #{...} in SQL
+                List<String> preparedParamOrder = parsePreparedParams(sql);
+                // replace all "#{...}" with "?" in SQL
+                sql = sql.replaceAll("#\\{([^#{}]*)}", "?");
+
+                // parse Replaced Params ${...} in SQL
+                List<String> replacedParamOrder = parseReplacedParams(sql);
                 String paraType = element.attributeValue("parameterType");
 
-                // when paraType is not given, the paraOrder must be null
+                // when paraType is not given, the preparedParamOrder must be null
                 if (paraType == null)
-                    AssertError.notMatchedError(paraOrder == null, "parameterType", paraType, "given parameters", "not null", sourceId);
-
-                // replace all "#{...}" with "?" in SQL
-                sql = sql.replaceAll("#\\{([^\\#\\{\\}]*)\\}", "?");
+                    AssertError.notMatchedError(preparedParamOrder == null, "parameterType", "null", "given parameters", "not null", sourceId);
 
                 // set result type alias according to typeAlias Properties
                 if (aliasMap != null && aliasMap.containsKey(resultType))
@@ -83,7 +85,8 @@ public class MapperBuilder {
                     mappedStatement.setParaType(aliasMap.get(paraType));
                 else mappedStatement.setParaType(paraType);
 
-                mappedStatement.setParaOrder(paraOrder);
+                mappedStatement.setPreparedParamOrder(preparedParamOrder);
+                mappedStatement.setReplacedParamOrder(replacedParamOrder);
                 mappedStatement.setNamespace(namespace);
                 mappedStatement.setSourceId(sourceId);
                 mappedStatement.setSql(sql);
@@ -96,9 +99,16 @@ public class MapperBuilder {
         return mapInfo;
     }
 
-    private List<String> parseParameters(String sql) {
+    private List<String> parsePreparedParams(String sql) {
+        return parseParams(sql, "#\\{([^#{}]*)}");
+    }
+
+    private List<String> parseReplacedParams(String sql) {
+        return parseParams(sql, "\\$\\{([^${}]*)}");
+    }
+
+    private List<String> parseParams(String sql, String pattern){
         List<String> paraOrder = new ArrayList<>();
-        String pattern = "#\\{([^\\#\\{\\}]*)\\}";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(sql);
         while (m.find()) {
@@ -107,7 +117,7 @@ public class MapperBuilder {
         return paraOrder.size() != 0 ? paraOrder : null;
     }
 
-    private class ResultMapBuilder {
+    private static class ResultMapBuilder {
         Map<String, Map<String, String>> resultMaps = new HashMap<>();
 
         public ResultMapBuilder(Element rootNode) {
