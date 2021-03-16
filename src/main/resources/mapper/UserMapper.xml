@@ -8,7 +8,7 @@
         <typeAlias type="com.rsh.easy_opm.User" alias="user"/>
     </typeAliases>
 
-    <select id="selectByPrimaryKey" parameterType="basic" resultType="com.rsh.easy_opm.User" resultMap="ResultUser">
+    <select id="selectByPrimaryKey" parameterType="basic" resultType="user" resultMap="ResultUser">
         select
             id,
             nick_name,
@@ -19,7 +19,7 @@
         where id = #{id};
     </select>
 
-    <select id="selectAll" resultType="com.rsh.easy_opm.User" resultMap="ResultUser">
+    <select id="selectAll" resultType="user" resultMap="ResultUser">
         select
             id,
             nick_name,
@@ -29,7 +29,7 @@
         from user;
     </select>
 
-    <insert id="insertOne" parameterType="com.rsh.easy_opm.User">
+    <insert id="insertOne" parameterType="user">
         insert into user
             values (#{id}, #{nickName}, #{realName}, #{sex}, #{age});
     </insert>
@@ -39,7 +39,7 @@
         where id=#{id};
     </delete>
 
-    <select id="selectByConditions" parameterType="map" resultType="com.rsh.easy_opm.User" resultMap="ResultUser">
+    <select id="selectByConditions" parameterType="map" resultType="user" resultMap="ResultUser">
         select
             real_name,
             age
@@ -47,10 +47,9 @@
         where id > #{idMin} and sex = #{gender}
     </select>
 
-    <update id="updateOne" parameterType="com.rsh.easy_opm.User">
+    <update id="updateOne" parameterType="user">
         update user
         set nick_name=#{nickName}, age=#{age}
         where id=#{id}
     </update>
-
 </mapper>

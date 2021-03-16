@@ -12,6 +12,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MapperBuilder {
+    // store all MappedStatement info
+    Map<String, MappedStatement> mapInfo = new HashMap<>();
+    // store all type alias info
+    Map<String, String> aliasMap;
+
     public Map<String, MappedStatement> parseMapperFile(String path) {
         URL resource = ConfigBuilder.class.getClassLoader().getResource(path);
         SAXReader reader = new SAXReader();
@@ -28,11 +33,7 @@ public class MapperBuilder {
         String namespace = rootNode.attributeValue("namespace");
         AssertError.notFoundError(namespace != null, "namespace", path);
 
-        // find all resultMap nodes in mapper
-        ResultMapBuilder resultMapBuilder = new ResultMapBuilder(rootNode);
-
-        // store all MappedStatement info
-        Map<String, MappedStatement> map = new HashMap<>();
+        aliasMap = parseTypeAlias(rootNode);
 
         for (SqlCommandType cur :
                 SqlCommandType.values()) {
@@ -51,9 +52,13 @@ public class MapperBuilder {
                 if (cur.equals(SqlCommandType.SELECT))
                     AssertError.notFoundError(resultType != null, "resultType", "Select Node in " + path);
 
+                // build MappedStatement Class to store mapper info
                 MappedStatement mappedStatement = new MappedStatement();
+
                 // use resultMap to set alias of db column
                 if (resultMap != null) {
+                    // find all resultMap nodes in mapper
+                    ResultMapBuilder resultMapBuilder = new ResultMapBuilder(rootNode);
                     mappedStatement.setResultMap(resultMapBuilder.getResultMap(resultMap));
                 }
 
@@ -68,20 +73,29 @@ public class MapperBuilder {
                 // replace all "#{...}" with "?" in SQL
                 sql = sql.replaceAll("#\\{([^\\#\\{\\}]*)\\}", "?");
 
+                // set result type alias according to typeAlias Properties
+                if (aliasMap != null && aliasMap.containsKey(resultType))
+                    mappedStatement.setResultType(aliasMap.get(resultType));
+                else mappedStatement.setResultType(resultType);
+
+                // set param type alias according to typeAlias Properties
+                if (aliasMap != null && aliasMap.containsKey(paraType))
+                    mappedStatement.setParaType(aliasMap.get(paraType));
+                else mappedStatement.setParaType(paraType);
+
                 mappedStatement.setParaOrder(paraOrder);
-                mappedStatement.setParaType(paraType);
                 mappedStatement.setNamespace(namespace);
                 mappedStatement.setSourceId(sourceId);
-                mappedStatement.setResultType(resultType);
                 mappedStatement.setSql(sql);
                 mappedStatement.setCommandType(commandType);
 
-                // register the mapper into mapperStatments
-                map.put(sourceId, mappedStatement);
+                // register the mapper into mapperStatements
+                mapInfo.put(sourceId, mappedStatement);
             }
         }
-        return map;
+        return mapInfo;
     }
+
     private List<String> parseParameters(String sql) {
         List<String> paraOrder = new ArrayList<>();
         String pattern = "#\\{([^\\#\\{\\}]*)\\}";
@@ -91,5 +105,47 @@ public class MapperBuilder {
             paraOrder.add(m.group(1));
         }
         return paraOrder.size() != 0 ? paraOrder : null;
+    }
+
+    private class ResultMapBuilder {
+        Map<String, Map<String, String>> resultMaps = new HashMap<>();
+
+        public ResultMapBuilder(Element rootNode) {
+            AssertError.notNullPointer(rootNode != null, "mapper");
+            List<Element> resultMapList = rootNode.elements("resultMap");
+            for (Element resultMapNode :
+                    resultMapList) {
+                String id = resultMapNode.attributeValue("id");
+                List<Element> resultList = resultMapNode.elements("result");
+                Map<String, String> resultMap = new HashMap<>();
+                for (Element resultNode :
+                        resultList) {
+                    String column = resultNode.attributeValue("column");
+                    String property = resultNode.attributeValue("property");
+                    resultMap.put(property, column);
+                }
+                this.resultMaps.put(id, resultMap);
+            }
+        }
+
+        public Map<String, String> getResultMap(String sourceID) {
+            AssertError.notFoundError(this.resultMaps.containsKey(sourceID), sourceID, "Result Maps");
+            return this.resultMaps.get(sourceID);
+        }
+    }
+
+    private Map<String, String> parseTypeAlias(Element rootNode) {
+        Element aliasesNode = rootNode.element("typeAliases");
+        if (aliasesNode == null)
+            return null;
+        Map<String, String> aliases = new HashMap<>();
+        List<Element> aliasNodes = aliasesNode.elements();
+        if (aliasNodes == null)
+            return null;
+        for (Element alias :
+                aliasNodes) {
+            aliases.put(alias.attributeValue("alias"), alias.attributeValue("type"));
+        }
+        return aliases;
     }
 }

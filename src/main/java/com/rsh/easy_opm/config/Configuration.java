@@ -34,7 +34,7 @@ public class Configuration {
         return result;
     }
 
-    public void checkConfig() {
+    public void checkDbConfig() {
         AssertError.notFoundError(dbDriver != null, "dbDriver", Configuration.EASYOPM_CONFIG_PATH);
         AssertError.notFoundError(dbUrl != null, "dbUrl", Configuration.EASYOPM_CONFIG_PATH);
         AssertError.notFoundError(dbUserName != null, "dbUserName", Configuration.EASYOPM_CONFIG_PATH);
