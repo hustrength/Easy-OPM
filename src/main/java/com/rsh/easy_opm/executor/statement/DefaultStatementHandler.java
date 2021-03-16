@@ -1,6 +1,7 @@
 package com.rsh.easy_opm.executor.statement;
 
 import com.rsh.easy_opm.config.MappedStatement;
+import com.rsh.easy_opm.error.AssertError;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,7 +23,8 @@ public class DefaultStatementHandler implements StatementHandler{
     @Override
     public ResultSet execute(PreparedStatement statement) {
         try {
-            switch (mappedStatment.getCommandType()){
+            String commandType = mappedStatment.getCommandType();
+            switch (commandType){
                 case "select":
                     return statement.executeQuery();
                 case "update":
@@ -30,6 +32,8 @@ public class DefaultStatementHandler implements StatementHandler{
                 case "delete":
                     statement.executeUpdate();
                     return null;
+                default:
+                    AssertError.notSupported("Operation", commandType);
             }
         } catch (SQLException e) {
             e.printStackTrace();

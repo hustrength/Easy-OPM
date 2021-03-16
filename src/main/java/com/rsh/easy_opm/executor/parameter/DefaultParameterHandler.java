@@ -25,8 +25,6 @@ public class DefaultParameterHandler implements ParameterHandler {
         if (parameter == null) {
             return;
         }
-        if (paraType == null)
-            ;
         switch (paraType) {
             case "map": {
                 // judge if Para1 is Map Type
@@ -34,13 +32,15 @@ public class DefaultParameterHandler implements ParameterHandler {
                 AssertError.notMatchedError(paraTypeMatched, "Para", "1", "paraType", "map");
 
                 // judge if given paraNum is correct
-                boolean paraNumMatched = paraOrder.size() == parameter.length;
-                AssertError.notMatchedError(paraNumMatched, "Set paraNum", String.valueOf(paraOrder.size()), "Given paraNum", String.valueOf(parameter.length));
-
                 Map<String, Object> map = (Map<String, Object>) parameter[0];
+                boolean paraNumMatched = paraOrder.size() == map.size();
+                AssertError.notMatchedError(paraNumMatched, "Set paraNum", String.valueOf(paraOrder.size()), "Given map paraNum", String.valueOf(map.size()));
+
                 Object[] mappedPara = new Object[map.size()];
                 for (int i = 0; i < mappedPara.length; i++) {
-                    (mappedPara)[i] = map.get(paraOrder.get(i));
+                    String curPara = paraOrder.get(i);
+                    AssertError.notFoundError(map.containsKey(curPara), "Set para[" + curPara + ']');
+                    (mappedPara)[i] = map.get(curPara);
                 }
                 setMappedPara(preparedStatement, mappedPara);
                 break;
@@ -58,7 +58,7 @@ public class DefaultParameterHandler implements ParameterHandler {
                 // if given para is not matched Class, exceptions will be thrown
                 try {
                     Class<?> entityClass = Class.forName(paraType);
-                    for (int i = 0; i < mappedPara.length; i++){
+                    for (int i = 0; i < mappedPara.length; i++) {
                         Field field = entityClass.getDeclaredField(paraOrder.get(i));
                         field.setAccessible(true);
                         mappedPara[i] = field.get(parameter[0]);

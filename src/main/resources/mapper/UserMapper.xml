@@ -4,6 +4,10 @@
         <result column="real_name" property="realName"/>
     </resultMap>
 
+    <typeAliases>
+        <typeAlias type="com.rsh.easy_opm.User" alias="user"/>
+    </typeAliases>
+
     <select id="selectByPrimaryKey" parameterType="basic" resultType="com.rsh.easy_opm.User" resultMap="ResultUser">
         select
             id,
@@ -30,9 +34,23 @@
             values (#{id}, #{nickName}, #{realName}, #{sex}, #{age});
     </insert>
 
-    <insert id="deleteByPrimaryKey" parameterType="basic">
+    <delete id="deleteByPrimaryKey" parameterType="basic">
         delete from user
         where id=#{id};
-    </insert>
+    </delete>
+
+    <select id="selectByConditions" parameterType="map" resultType="com.rsh.easy_opm.User" resultMap="ResultUser">
+        select
+            real_name,
+            age
+        from user
+        where id > #{idMin} and sex = #{gender}
+    </select>
+
+    <update id="updateOne" parameterType="com.rsh.easy_opm.User">
+        update user
+        set nick_name=#{nickName}, age=#{age}
+        where id=#{id}
+    </update>
 
 </mapper>

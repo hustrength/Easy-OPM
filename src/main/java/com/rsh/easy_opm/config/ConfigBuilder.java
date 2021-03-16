@@ -99,84 +99,8 @@ public class ConfigBuilder {
         for (Element cur :
                 environments) {
             String resource = cur.attributeValue("resource");
-            parseMapperFile(resource);
+            MapperBuilder mapperBuilder = new MapperBuilder();
+            config.getMappedStatements().putAll(mapperBuilder.parseMapperFile(resource));
         }
-    }
-
-    public void parseMapperFile(String path) {
-        URL resource = ConfigBuilder.class.getClassLoader().getResource(path);
-        SAXReader reader = new SAXReader();
-        Document document = null;
-
-        try {
-            document = reader.read(resource);
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        }
-
-        AssertError.notFoundError(document != null, path);
-        Element rootNode = document.getRootElement();
-        String namespace = rootNode.attributeValue("namespace");
-        AssertError.notFoundError(namespace != null, "namespace", "mapper");
-
-        // find all resultMap nodes in mapper
-        ResultMapBuilder resultMapBuilder = new ResultMapBuilder(rootNode);
-
-        for (SqlCommandType cur :
-                SqlCommandType.values()) {
-            String commandType = cur.name().toLowerCase(Locale.ROOT);
-
-            List<Element> commands = rootNode.elements(commandType);
-            for (Element element : commands) {
-                String id = element.attributeValue("id");
-                String sourceId = namespace + "." + id;
-                String resultType = element.attributeValue("resultType");
-                String sql = element.getText();
-                String resultMap = element.attributeValue("resultMap");
-
-                AssertError.notFoundError(id != null, "id", "mapper");
-                AssertError.notFoundError(sql != null, "sql", "mapper");
-
-                MappedStatement mappedStatement = new MappedStatement();
-                // use resultMap when resultType is not given
-                if (resultMap != null) {
-                    mappedStatement.setResultMap(resultMapBuilder.getResultMap(resultMap));
-                }
-
-                // parse and bind parameters in SQL
-                List<String> paraOrder = parseParameters(sql);
-
-                String paraType = element.attributeValue("parameterType");
-
-                // when paraType is not given, the paraOrder must be null
-                if (paraType == null)
-                    AssertError.notMatchedError(paraOrder == null, "parameterType", paraType, "given parameters", "not null", sourceId);
-
-                // replace all "#{...}" with "?" in SQL
-                sql = sql.replaceAll("#\\{([^\\#\\{\\}]*)\\}", "?");
-
-                mappedStatement.setParaOrder(paraOrder);
-                mappedStatement.setParaType(paraType);
-                mappedStatement.setNamespace(namespace);
-                mappedStatement.setSourceId(sourceId);
-                mappedStatement.setResultType(resultType);
-                mappedStatement.setSql(sql);
-                mappedStatement.setCommandType(commandType);
-
-                // register the mapper into mapperStatments
-                config.getMappedStatements().put(sourceId, mappedStatement);
-            }
-        }
-    }
-
-    private List<String> parseParameters(String sql) {
-        List<String> paraOrder = new ArrayList<>();
-        String pattern = "#\\{([^\\#\\{\\}]*)\\}";
-        Pattern r = Pattern.compile(pattern);
-        Matcher m = r.matcher(sql);
-        while (m.find()) {
-            paraOrder.add(m.group(1));
-        }
-        return paraOrder.size() != 0 ? paraOrder : null;
     }
 }
