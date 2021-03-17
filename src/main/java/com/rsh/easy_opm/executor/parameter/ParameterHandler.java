@@ -7,5 +7,5 @@ import java.util.List;
 public interface ParameterHandler {
 //    void setParameters(PreparedStatement ps) throws SQLException;
 
-    void setParameters(String paramType, List<String> paramOrder, Object[] parameter) throws SQLException;
+    Object setParameters(String paramType, List<String> paramOrder, Object[] parameter) throws SQLException;
 }

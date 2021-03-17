@@ -1,5 +1,7 @@
 package com.rsh.easy_opm.sqlsession;
 
+import com.rsh.easy_opm.config.MappedStatement;
+
 import java.util.List;
 
 public interface SqlSession {

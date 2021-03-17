@@ -29,9 +29,7 @@ public class Configuration {
     }
 
     public MappedStatement queryMappedStatement(String sourceID) {
-        MappedStatement result = this.mappedStatements.get(sourceID);
-        AssertError.notMatchedError(result != null, "Mapper ID", sourceID);
-        return result;
+        return mappedStatements.get(sourceID);
     }
 
     public void checkDbConfig() {

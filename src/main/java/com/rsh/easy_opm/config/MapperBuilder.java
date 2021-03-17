@@ -25,13 +25,13 @@ public class MapperBuilder {
         try {
             document = reader.read(resource);
         } catch (DocumentException e) {
+            System.out.println("Fail to load " + resource);
             e.printStackTrace();
         }
 
         AssertError.notFoundError(document != null, path);
         Element rootNode = document.getRootElement();
         String namespace = rootNode.attributeValue("namespace");
-        AssertError.notFoundError(namespace != null, "namespace", path);
 
         aliasMap = parseTypeAlias(rootNode);
 
@@ -47,8 +47,7 @@ public class MapperBuilder {
                 String sql = element.getText();
                 String resultMap = element.attributeValue("resultMap");
 
-                AssertError.notFoundError(id != null, "id", path);
-                AssertError.notFoundError(sql != null, "sql", path);
+                // resultType Attr is necessary in Select Node
                 if (cur.equals(SqlCommandType.SELECT))
                     AssertError.notFoundError(resultType != null, "resultType", "Select Node in " + path);
 
@@ -70,10 +69,6 @@ public class MapperBuilder {
                 // parse Replaced Params ${...} in SQL
                 List<String> replacedParamOrder = parseReplacedParams(sql);
                 String paraType = element.attributeValue("parameterType");
-
-                // when paraType is not given, the preparedParamOrder must be null
-                if (paraType == null)
-                    AssertError.notMatchedError(preparedParamOrder == null, "parameterType", "null", "given parameters", "not null", sourceId);
 
                 // set result type alias according to typeAlias Properties
                 if (aliasMap != null && aliasMap.containsKey(resultType))
@@ -99,15 +94,15 @@ public class MapperBuilder {
         return mapInfo;
     }
 
-    private List<String> parsePreparedParams(String sql) {
+    public static List<String> parsePreparedParams(String sql) {
         return parseParams(sql, "#\\{([^#{}]*)}");
     }
 
-    private List<String> parseReplacedParams(String sql) {
+    public static List<String> parseReplacedParams(String sql) {
         return parseParams(sql, "\\$\\{([^${}]*)}");
     }
 
-    private List<String> parseParams(String sql, String pattern){
+    private static List<String> parseParams(String sql, String pattern){
         List<String> paraOrder = new ArrayList<>();
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(sql);

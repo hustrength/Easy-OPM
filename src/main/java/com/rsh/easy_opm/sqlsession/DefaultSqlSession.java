@@ -2,6 +2,7 @@ package com.rsh.easy_opm.sqlsession;
 
 import com.rsh.easy_opm.config.Configuration;
 import com.rsh.easy_opm.config.MappedStatement;
+import com.rsh.easy_opm.error.AssertError;
 import com.rsh.easy_opm.executor.BaseExecutor;
 import com.rsh.easy_opm.executor.Executor;
 
@@ -40,6 +41,7 @@ public class DefaultSqlSession implements SqlSession{
     @Override
     public <E> List<E> selectList(String sourceID, Object[] parameter) {
         MappedStatement mappedStatement = config.queryMappedStatement(sourceID);
+        AssertError.notMatchedError(mappedStatement != null, "Mapper source id", sourceID);
         try {
             return executor.query(mappedStatement, parameter);
         } catch (SQLException e) {

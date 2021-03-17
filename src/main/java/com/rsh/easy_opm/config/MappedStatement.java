@@ -1,5 +1,7 @@
 package com.rsh.easy_opm.config;
 
+import com.rsh.easy_opm.error.AssertError;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -109,14 +111,25 @@ public class MappedStatement {
                 '}';
     }
 
-    public String printResultMap(){
+    public String printResultMap() {
         if (this.resultMap == null) return null;
-        Set<String> keySet= this.resultMap.keySet();
-        StringBuffer resultString = new StringBuffer();
+        Set<String> keySet = this.resultMap.keySet();
+        StringBuilder resultString = new StringBuilder();
         for (String key :
                 keySet) {
-            resultString.append('(' + key + ", " + this.resultMap.get(key) + ") ");
+            resultString.append('(').append(key).append(", ").append(this.resultMap.get(key)).append(") ");
         }
         return resultString.toString().trim();
     }
+
+    public void CheckMapperInfo() {
+        AssertError.notFoundError(namespace != null, "namespace", "Mapper[Source ID: "+ sourceId +']');
+        AssertError.notFoundError(sourceId != null, "id", "Mapper[Source ID: "+ sourceId +']');
+        AssertError.notFoundError(sql != null, "sql", "Mapper[Source ID: "+ sourceId +']');
+
+        // when paraType is not given, the preparedParamOrder must be null
+        if (paraType == null)
+            AssertError.notMatchedError(preparedParamOrder == null, "parameterType", "null", "given parameters", "not null", sourceId);
+    }
+
 }

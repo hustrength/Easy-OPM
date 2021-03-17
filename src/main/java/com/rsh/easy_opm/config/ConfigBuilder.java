@@ -44,6 +44,8 @@ public class ConfigBuilder {
         } catch (DocumentException e) {
             e.printStackTrace();
         }
+
+        AssertError.notFoundError(document != null, Configuration.EASYOPM_CONFIG_PATH);
         return document.getRootElement();
     }
 

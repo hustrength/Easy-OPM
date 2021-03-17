@@ -23,15 +23,15 @@ public class TestEasy_OPM {
 //        userMapper.deleteByPrimaryKey(4);
 //        System.out.println("OK");
 //        System.out.println();
-//
-//        userList = userMapper.selectAll();
-//        System.out.println("UserMapper.selecetAll():");
-//        for (User user :
-//                userList) {
-//            System.out.println(user.toString());
-//        }
-//        System.out.println();
-//
+
+        userList = userMapper.selectAll();
+        System.out.println("UserMapper.selecetAll():");
+        for (User user :
+                userList) {
+            System.out.println(user.toString());
+        }
+        System.out.println();
+
 //        System.out.println("UserMapper.insertOne():");
 //        User user = new User();
 //        user.setId(4);
@@ -47,20 +47,20 @@ public class TestEasy_OPM {
 //        System.out.println(userMapper.selectByPrimaryKey(4));
 //        System.out.println();
 
-        System.out.println("UserMapper.selecetByConditions():");
-        Map<String, Object> map = new HashMap<>();
-        map.put("column1", "id");
-        map.put("value1", 2);
-        map.put("column2", "age");
-        map.put("value2", 20);
-        map.put("column3", "sex");
-        map.put("value3", true);
-        userList = userMapper.selectByConditions(map);
-        for (User user1 :
-                userList) {
-            System.out.println(user1.toString());
-        }
-        System.out.println();
+//        System.out.println("UserMapper.selecetByConditions():");
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("column1", "id");
+//        map.put("value1", 2);
+//        map.put("column2", "age");
+//        map.put("value2", 20);
+//        map.put("column3", "sex");
+//        map.put("value3", true);
+//        userList = userMapper.selectByConditions(map);
+//        for (User user1 :
+//                userList) {
+//            System.out.println(user1.toString());
+//        }
+//        System.out.println();
 
 //        System.out.println("UserMapper.updateOne():");
 //        User user = new User();
@@ -71,7 +71,6 @@ public class TestEasy_OPM {
 //        user.setAge(21);
 //        userMapper.updateOne(user);
 //        System.out.println("OK");
-
     }
 }
 

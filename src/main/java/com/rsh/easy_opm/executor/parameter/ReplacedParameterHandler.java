@@ -21,10 +21,10 @@ public class ReplacedParameterHandler implements ParameterHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void setParameters(String paramType, List<String> paramOrder, Object[] parameter) throws SQLException {
+    public Object setParameters(String paramType, List<String> paramOrder, Object[] parameter) throws SQLException {
         // when paramOrder is null, there is no replaced params
         if (paramOrder == null)
-            return;
+            return sql;
         // when paramOrder is not null, the paramType must be map
         AssertError.notMatchedError(paramType.equals("map"), "Using replaced params ${...}, paramType", paramType, "specified paramType", "map");
 
@@ -36,5 +36,6 @@ public class ReplacedParameterHandler implements ParameterHandler {
         while (m.find()) {
             sql = sql.replaceFirst(pattern, String.valueOf(map.get(m.group(1))));
         }
+        return sql;
     }
 }

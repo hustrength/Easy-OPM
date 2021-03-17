@@ -14,7 +14,7 @@ public class ReflectionUtil {
         Map<String, String> resultMap = ms.getResultMap();
         boolean mapped = resultMap != null;
         try {
-            Class<?> entityClass = Class.forName(ms.getResultType());
+            Class<E> entityClass = (Class<E>) Class.forName(ms.getResultType());
             E entity = (E) entityClass.newInstance();
             Field[] declaredFields = entityClass.getDeclaredFields();
             for (Field field : declaredFields) {

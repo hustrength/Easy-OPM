@@ -21,20 +21,20 @@ public class BaseExecutor implements Executor {
     @Override
     public <E> List<E> query(MappedStatement ms, Object[] parameter) throws SQLException {
         // Instantiate ReplacedParameterHandler Class
-        ReplacedParameterHandler replacedParamHandler = new ReplacedParameterHandler(ms.getSql());
+        ParameterHandler replacedParamHandler = new ReplacedParameterHandler(ms.getSql());
 
         // Set replaced parameters
-        replacedParamHandler.setParameters(ms.getParaType(), ms.getReplacedParamOrder(), parameter);
+        String replacedSql = (String) replacedParamHandler.setParameters(ms.getParaType(), ms.getReplacedParamOrder(), parameter);
+        ms.setSql(replacedSql);
 
         // Instantiate StatementHandler Class
-        ms.setSql(replacedParamHandler.getSql());
         StatementHandler statementHandler = new DefaultStatementHandler(ms);
 
         // Get PreparedStatement from conn
         PreparedStatement preparedStatement = statementHandler.prepare(conn);
 
         // Instantiate PreparedParameterHandler Class
-        PreparedParameterHandler preparedParamHandler = new PreparedParameterHandler(preparedStatement );
+        ParameterHandler preparedParamHandler = new PreparedParameterHandler(preparedStatement );
 
         // Set prepared parameters
         preparedParamHandler.setParameters(ms.getParaType(), ms.getPreparedParamOrder(), parameter);

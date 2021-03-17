@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class PreparedParameterHandler implements ParameterHandler {
 
-    private PreparedStatement preparedStatement;
+    private final PreparedStatement preparedStatement;
 
     public PreparedParameterHandler(PreparedStatement preparedStatement) {
         this.preparedStatement = preparedStatement;
@@ -20,9 +20,9 @@ public class PreparedParameterHandler implements ParameterHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void setParameters(String paramType, List<String> paramOrder, Object[] parameter) throws SQLException {
+    public Object setParameters(String paramType, List<String> paramOrder, Object[] parameter) throws SQLException {
         if (parameter == null) {
-            return;
+            return null;
         }
         switch (paramType) {
             case "map": {
@@ -61,7 +61,7 @@ public class PreparedParameterHandler implements ParameterHandler {
                 setMappedParam(preparedStatement, mappedParam);
             }
         }
-
+        return null;
     }
 
     private void setMappedParam(PreparedStatement preparedStatement, Object[] param) throws SQLException {
