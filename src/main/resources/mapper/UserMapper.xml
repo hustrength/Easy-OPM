@@ -16,7 +16,7 @@
             sex,
             age
         from user
-        where id = #{id};
+        where id=#{id};
     </select>
 
     <select id="selectAll" resultType="user" resultMap="ResultUser">
@@ -44,7 +44,7 @@
             real_name,
             age
         from user
-        where ${column1} > #{value1} and ${column2} > #{value2} and ${column3} = #{value3};
+        where ${column1}>#{value1} and ${column2}>#{value2} and ${column3}=#{value3};
     </select>
 
     <update id="updateOne" parameterType="user">

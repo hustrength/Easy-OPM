@@ -1,0 +1,65 @@
+<mapper namespace="com.rsh.easy_opm.User_WorkMapper">
+    <typeAliases>
+        <typeAlias type="com.rsh.easy_opm.User" alias="User"/>
+        <typeAlias type="com.rsh.easy_opm.WorkInfo" alias="WorkInfo"/>
+    </typeAliases>
+
+    <resultMap id="workInfoMapper">
+        <result column="nick_name" property="nickName"/>
+        <result column="real_name" property="realName"/>
+        <collection ofType="WorkInfo">
+            <result column="work_id" property="workId"/>
+            <result column="user_id" property="userId"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="TwoStepUserMapper">
+        <result column="nick_name" property="nickName"/>
+        <result column="real_name" property="realName"/>
+        <collection ofType="WorkInfo"
+                    select="queryWorkById" column="work_id">
+            <result column="work_id" property="workId"/>
+            <result column="user_id" property="userId"/>
+        </collection>
+    </resultMap>
+
+    <select id="queryUserWorkByUserId" parameterType="basic" resultType="User" resultMap="workInfoMapper">
+        select
+            id,
+            nick_name,
+            real_name,
+            sex,
+            age,
+            work_id,
+            user_id,
+            company,
+            position,
+            start,
+            departure
+        from user, workinfo
+        where id=user_id and id=#{id};
+    </select>
+
+    <select id="queryUserById" parameterType="basic" resultType="User" resultMap="TwoStepUserMapper">
+        select
+            id,
+            nick_name,
+            real_name,
+            sex,
+            age
+        from user
+        where id=#{id};
+    </select>
+
+    <select id="queryWorkById" parameterType="basic" resultType="WorkInfo">
+        select
+            work_id,
+            user_id,
+            company,
+            position,
+            start,
+            departure
+        from workinfo
+        where work_id=#{id}
+    </select>
+</mapper>

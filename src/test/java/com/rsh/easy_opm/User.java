@@ -1,6 +1,7 @@
 package com.rsh.easy_opm;
 
 import java.io.Serializable;
+import java.util.Set;
 
 public class User implements Serializable {
     private int id;
@@ -13,7 +14,17 @@ public class User implements Serializable {
 
     private int age;
 
+    private Set<WorkInfo> workInfos;
+
     public User() {
+    }
+
+    public Set<WorkInfo> getWorkInfos() {
+        return workInfos;
+    }
+
+    public void setWorkInfos(Set<WorkInfo> workInfos) {
+        this.workInfos = workInfos;
     }
 
     public int getId() {
@@ -64,6 +75,18 @@ public class User implements Serializable {
                 ", realName='" + realName + '\'' +
                 ", sex='" + sex + '\'' +
                 ", age='" + age + '\'' +
+                ",\n\tWorkInfos={" + printWorkInfo() + '}' +
                 '}';
+    }
+
+    private String printWorkInfo() {
+        if (workInfos == null)
+            return null;
+        StringBuilder result = new StringBuilder("");
+        for (WorkInfo workInfo :
+                workInfos) {
+            result.append(workInfo.toString()).append(", ");
+        }
+        return result.substring(0, result.length() - 2);
     }
 }
