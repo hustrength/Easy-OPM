@@ -19,6 +19,7 @@ public class MapperBuilder {
 
     public Map<String, MappedStatement> parseMapperFile(String path) {
         URL resource = ConfigBuilder.class.getClassLoader().getResource(path);
+        AssertError.notFoundError(resource != null, path);
         SAXReader reader = new SAXReader();
         Document document = null;
 
@@ -129,6 +130,7 @@ public class MapperBuilder {
                     String property = resultNode.attributeValue("property");
                     resultMap.put(property, column);
                 }
+
                 this.resultMaps.put(id, resultMap);
             }
         }

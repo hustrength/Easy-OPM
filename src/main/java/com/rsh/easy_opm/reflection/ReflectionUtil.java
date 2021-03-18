@@ -43,6 +43,8 @@ public class ReflectionUtil {
                         default:
                             AssertError.notSupported("fieldType", field.getType().getSimpleName());
                     }
+                } else {
+                    System.out.println("\033[31m" + "WARNING: field[" + mappedName + "] does not exist in result set. Set null/0 to filed[" + mappedName + ']' + "\033[0m");
                 }
             }
             return entity;

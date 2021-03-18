@@ -11,10 +11,5 @@ public @interface Insert {
      *
      * @return an SQL for retrieving record(s)
      */
-    String sql();
-
-    /**
-     * @return the type of parameters
-     */
-    String paramType() default "class";
+    String value();
 }

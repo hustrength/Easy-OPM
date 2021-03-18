@@ -11,12 +11,5 @@ public @interface Update {
      *
      * @return an SQL for retrieving record(s)
      */
-    String sql();
-
-    /**
-     * the default value is "class"
-     *
-     * @return the type of parameters
-     */
-    String paramType() default "class";
+    String value();
 }

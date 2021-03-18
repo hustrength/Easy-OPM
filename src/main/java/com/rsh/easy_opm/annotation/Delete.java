@@ -11,12 +11,5 @@ public @interface Delete {
      *
      * @return an SQL for retrieving record(s)
      */
-    String sql();
-
-    /**
-     * the default value is "class"
-     *
-     * @return the type of parameters
-     */
-    String paramType();
+    String value();
 }

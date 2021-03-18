@@ -5,11 +5,9 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Select {
+public @interface ParamType {
     /**
-     * Returns an SQL for retrieving record(s).
-     *
-     * @return an SQL for retrieving record(s)
+     * @return the type of parameters
      */
-    String value();
+    Class<?> value();
 }
