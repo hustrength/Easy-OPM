@@ -36,12 +36,14 @@ public class ConfigBuilder {
 
     private Element loadXML() {
         URL resource = ConfigBuilder.class.getClassLoader().getResource(Configuration.EASYOPM_CONFIG_PATH);
+        AssertError.notFoundError(resource != null, Configuration.EASYOPM_CONFIG_PATH);
         SAXReader reader = new SAXReader();
         Document document = null;
 
         try {
             document = reader.read(resource);
         } catch (DocumentException e) {
+            System.out.println("Fail to load " + resource);
             e.printStackTrace();
         }
 
