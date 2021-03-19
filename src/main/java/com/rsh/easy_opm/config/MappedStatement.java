@@ -26,6 +26,9 @@ public class MappedStatement {
     // symbol ${...}
     private List<String> replacedParamOrder;
 
+    // class chain of collection node in resultMap
+    private List<String> resultMapClassChain;
+
     private String paraType;
 
     public String getNamespace() {
@@ -100,6 +103,14 @@ public class MappedStatement {
         this.paraType = paraType;
     }
 
+    public List<String> getResultMapClassChain() {
+        return resultMapClassChain;
+    }
+
+    public void setResultMapClassChain(List<String> resultMapClassChain) {
+        this.resultMapClassChain = resultMapClassChain;
+    }
+
     @Override
     public String toString() {
         return "MappedStatement{" +
@@ -122,7 +133,7 @@ public class MappedStatement {
         return resultString.toString().trim();
     }
 
-    public void CheckMapperInfo() {
+    public void checkMapperInfo() {
         AssertError.notFoundError(namespace != null, "namespace", "Mapper[Source ID: "+ sourceId +']');
         AssertError.notFoundError(sourceId != null, "id", "Mapper[Source ID: "+ sourceId +']');
         AssertError.notFoundError(sql != null, "sql", "Mapper[Source ID: "+ sourceId +']');

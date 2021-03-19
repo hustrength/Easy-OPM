@@ -10,6 +10,10 @@
         <collection ofType="WorkInfo">
             <result column="work_id" property="workId"/>
             <result column="user_id" property="userId"/>
+            <result column="company" property="company"/>
+            <result column="position" property="position"/>
+            <result column="start" property="start"/>
+            <result column="departure" property="departure"/>
         </collection>
     </resultMap>
 
@@ -20,6 +24,10 @@
                     select="queryWorkById" column="work_id">
             <result column="work_id" property="workId"/>
             <result column="user_id" property="userId"/>
+            <result column="company" property="company"/>
+            <result column="position" property="position"/>
+            <result column="start" property="start"/>
+            <result column="departure" property="departure"/>
         </collection>
     </resultMap>
 

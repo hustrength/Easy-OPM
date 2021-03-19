@@ -38,12 +38,12 @@ public class AnnotationParser {
         boolean foundAnnotation = false;
 
         String paramType = null;
-        if (method.isAnnotationPresent(ParamType.class)){
+        if (method.isAnnotationPresent(ParamType.class)) {
             ParamType type = method.getAnnotation(ParamType.class);
             Class<?> typeValue = type.value();
-            if (Number.class.isAssignableFrom(typeValue) || String.class.isAssignableFrom(typeValue)){
+            if (Number.class.isAssignableFrom(typeValue) || String.class.isAssignableFrom(typeValue)) {
                 paramType = "basic";
-            } else if (typeValue.isAssignableFrom(Map.class)){
+            } else if (typeValue.isAssignableFrom(Map.class)) {
                 paramType = "map";
             } else {
                 paramType = typeValue.getName();
@@ -83,9 +83,11 @@ public class AnnotationParser {
         }
 
         if (method.isAnnotationPresent(Results.class)) {
-            if (method.isAnnotationPresent(ResultMap.class))
+            if (method.isAnnotationPresent(ResultMap.class)) {
+                System.out.println();
                 System.out.println("\033[31m" + "WARNING: @Results and @ResultMap are both set in " + mapperInterface.getName() + ". Use @Results in priority" + "\033[0m");
-
+                System.out.println();
+            }
             Results results = method.getAnnotation(Results.class);
             String resultsID = results.id();
             AssertError.notFoundError(resultMaps.containsKey(resultsID), "resultsID from @ResultMap", "known resultMaps in " + mapperInterface.getName());
@@ -98,6 +100,8 @@ public class AnnotationParser {
             ms.setResultMap(resultMaps.get(resultsID));
             foundAnnotation = true;
         }
+
+        ms.checkMapperInfo();
 
         return foundAnnotation ? ms : null;
     }

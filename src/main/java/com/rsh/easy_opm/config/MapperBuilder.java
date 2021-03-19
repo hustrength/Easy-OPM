@@ -34,7 +34,11 @@ public class MapperBuilder {
         Element rootNode = document.getRootElement();
         String namespace = rootNode.attributeValue("namespace");
 
+        // find all typeAliases
         aliasMap = parseTypeAlias(rootNode);
+
+        // find all resultMap nodes in mapper
+        ResultMapBuilder resultMapBuilder = new ResultMapBuilder(rootNode, aliasMap);
 
         for (SqlCommandType cur :
                 SqlCommandType.values()) {
@@ -55,11 +59,10 @@ public class MapperBuilder {
                 // build MappedStatement Class to store mapper info
                 MappedStatement mappedStatement = new MappedStatement();
 
-                // use resultMap to set alias of db column
+                // get resultMap and class chain of collection node in resultMap by resultMap ID
                 if (resultMap != null) {
-                    // find all resultMap nodes in mapper
-                    ResultMapBuilder resultMapBuilder = new ResultMapBuilder(rootNode);
                     mappedStatement.setResultMap(resultMapBuilder.getResultMap(resultMap));
+                    mappedStatement.setResultMapClassChain(resultMapBuilder.getResultMapClassChain(resultMap));
                 }
 
                 // parse Prepared Params #{...} in SQL
@@ -88,6 +91,8 @@ public class MapperBuilder {
                 mappedStatement.setSql(sql);
                 mappedStatement.setCommandType(commandType);
 
+                mappedStatement.checkMapperInfo();
+
                 // register the mapper into mapperStatements
                 mapInfo.put(sourceId, mappedStatement);
             }
@@ -111,34 +116,6 @@ public class MapperBuilder {
             paraOrder.add(m.group(1));
         }
         return paraOrder.size() != 0 ? paraOrder : null;
-    }
-
-    private static class ResultMapBuilder {
-        Map<String, Map<String, String>> resultMaps = new HashMap<>();
-
-        public ResultMapBuilder(Element rootNode) {
-            AssertError.notNullPointer(rootNode != null, "mapper");
-            List<Element> resultMapList = rootNode.elements("resultMap");
-            for (Element resultMapNode :
-                    resultMapList) {
-                String id = resultMapNode.attributeValue("id");
-                List<Element> resultList = resultMapNode.elements("result");
-                Map<String, String> resultMap = new HashMap<>();
-                for (Element resultNode :
-                        resultList) {
-                    String column = resultNode.attributeValue("column");
-                    String property = resultNode.attributeValue("property");
-                    resultMap.put(property, column);
-                }
-
-                this.resultMaps.put(id, resultMap);
-            }
-        }
-
-        public Map<String, String> getResultMap(String sourceID) {
-            AssertError.notFoundError(this.resultMaps.containsKey(sourceID), sourceID, "Result Maps");
-            return this.resultMaps.get(sourceID);
-        }
     }
 
     private Map<String, String> parseTypeAlias(Element rootNode) {
