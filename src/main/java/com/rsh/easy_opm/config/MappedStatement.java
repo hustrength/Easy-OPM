@@ -26,9 +26,6 @@ public class MappedStatement {
     // symbol ${...}
     private List<String> replacedParamOrder;
 
-    // class chain of collection node in resultMap
-    private List<String> resultMapClassChain;
-
     private String paraType;
 
     public String getNamespace() {
@@ -101,14 +98,6 @@ public class MappedStatement {
 
     public void setParaType(String paraType) {
         this.paraType = paraType;
-    }
-
-    public List<String> getResultMapClassChain() {
-        return resultMapClassChain;
-    }
-
-    public void setResultMapClassChain(List<String> resultMapClassChain) {
-        this.resultMapClassChain = resultMapClassChain;
     }
 
     @Override

@@ -3,14 +3,12 @@ package com.rsh.easy_opm.config;
 import com.rsh.easy_opm.error.AssertError;
 import org.dom4j.Element;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ResultMapBuilder {
     Map<String, Map<String, String>> resultMaps = new HashMap<>();
-    Map<String, List<String>> resultMapClassChains;
     Map<String, String> aliasMap;
 
     public ResultMapBuilder(Element rootNode, Map<String, String> aliasMap) {
@@ -33,11 +31,11 @@ public class ResultMapBuilder {
                 resultMap.put(property, column);
             }
 
-            // parse collection
-            List<String> classChain = parseCollection(rootNode.element("collection"), resultMap);
-            if (classChain != null) {
-                resultMapClassChains = new HashMap<>();
-                resultMapClassChains.put(id, classChain);
+            // parse associations
+            List<Element> associations = resultMapNode.elements("association");
+            for (Element association :
+                    associations) {
+                parseAssociation(association, resultMap);
             }
             resultMaps.put(id, resultMap);
         }
@@ -48,36 +46,30 @@ public class ResultMapBuilder {
         return this.resultMaps.get(sourceID);
     }
 
-    private List<String> parseCollection(Element ele, Map<String, String> resultMap) {
+    private void parseAssociation(Element ele, Map<String, String> resultMap) {
         if (ele == null)
-            return null;
-        List<String> classChian = new ArrayList<>();
+            return;
         String ofType = ele.attributeValue("ofType");
 
         // replace alias with real type
         if (aliasMap.containsKey(ofType))
             ofType = aliasMap.get(ofType);
 
-        classChian.add(ofType);
-
         List<Element> resultList = ele.elements("result");
         for (Element resultNode :
                 resultList) {
             String column = resultNode.attributeValue("column");
             String property = resultNode.attributeValue("property");
-            // for collection, (property@ofType, column) consists of resultMap
+            // for association, (property@ofType, column) consists of resultMap
             // for normal result, (property, column) consists of resultMap
             resultMap.put(property + '@' + ofType, column);
         }
-        // continue to parse collection
-        classChian.addAll(parseCollection(ele.element("collection"), resultMap));
-        return classChian;
-    }
 
-    public List<String> getResultMapClassChain(String sourceID) {
-        if (resultMapClassChains == null)
-            return null;
-        AssertError.notFoundError(resultMapClassChains.containsKey(sourceID), sourceID, "Result Maps");
-        return resultMapClassChains.get(sourceID);
+        // continue to parse association
+        List<Element> associations = ele.elements("association");
+        for (Element association :
+                associations) {
+            parseAssociation(association, resultMap);
+        }
     }
 }

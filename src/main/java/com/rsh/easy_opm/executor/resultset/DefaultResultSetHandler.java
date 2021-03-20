@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultResultSetHandler implements ResultSetHandler {
-    private MappedStatement mappedStatement;
+    private final MappedStatement mappedStatement;
 
     public DefaultResultSetHandler(MappedStatement mappedStatement) {
         this.mappedStatement = mappedStatement;

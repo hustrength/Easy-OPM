@@ -62,7 +62,6 @@ public class MapperBuilder {
                 // get resultMap and class chain of collection node in resultMap by resultMap ID
                 if (resultMap != null) {
                     mappedStatement.setResultMap(resultMapBuilder.getResultMap(resultMap));
-                    mappedStatement.setResultMapClassChain(resultMapBuilder.getResultMapClassChain(resultMap));
                 }
 
                 // parse Prepared Params #{...} in SQL

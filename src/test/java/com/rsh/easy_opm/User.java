@@ -1,6 +1,7 @@
 package com.rsh.easy_opm;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 public class User implements Serializable {
@@ -14,18 +15,26 @@ public class User implements Serializable {
 
     private int age;
 
-    private Set<WorkInfo> workInfos;
+    private WorkInfo workInfo;
 
     public User() {
     }
 
-    public Set<WorkInfo> getWorkInfos() {
+    public WorkInfo getWorkInfo() {
+        return workInfo;
+    }
+
+    public void setWorkInfo(WorkInfo workInfo) {
+        this.workInfo = workInfo;
+    }
+
+/*        public List<WorkInfo> getWorkInfos() {
         return workInfos;
     }
 
-    public void setWorkInfos(Set<WorkInfo> workInfos) {
+    public void setWorkInfos(List<WorkInfo> workInfos) {
         this.workInfos = workInfos;
-    }
+    }*/
 
     public int getId() {
         return id;
@@ -51,7 +60,7 @@ public class User implements Serializable {
         this.realName = realName;
     }
 
-    public boolean getSex() {
+    public boolean isSex() {
         return sex;
     }
 
@@ -75,11 +84,12 @@ public class User implements Serializable {
                 ", realName='" + realName + '\'' +
                 ", sex='" + sex + '\'' +
                 ", age='" + age + '\'' +
-                ",\n\tWorkInfos={" + printWorkInfo() + '}' +
+//                ",\n\tWorkInfos={" + printWorkInfo() + '}' +
+                ", workInfo='" + workInfo.toString() + '\'' +
                 '}';
     }
 
-    private String printWorkInfo() {
+    /*private String printWorkInfo() {
         if (workInfos == null)
             return null;
         StringBuilder result = new StringBuilder("");
@@ -88,5 +98,5 @@ public class User implements Serializable {
             result.append(workInfo.toString()).append(", ");
         }
         return result.substring(0, result.length() - 2);
-    }
+    }*/
 }

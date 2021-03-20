@@ -7,20 +7,20 @@
     <resultMap id="workInfoMapper">
         <result column="nick_name" property="nickName"/>
         <result column="real_name" property="realName"/>
-        <collection ofType="WorkInfo">
+        <association ofType="WorkInfo">
             <result column="work_id" property="workId"/>
             <result column="user_id" property="userId"/>
             <result column="company" property="company"/>
             <result column="position" property="position"/>
             <result column="start" property="start"/>
             <result column="departure" property="departure"/>
-        </collection>
+        </association>
     </resultMap>
 
     <resultMap id="TwoStepUserMapper">
         <result column="nick_name" property="nickName"/>
         <result column="real_name" property="realName"/>
-        <collection ofType="WorkInfo"
+        <association ofType="WorkInfo"
                     select="queryWorkById" column="work_id">
             <result column="work_id" property="workId"/>
             <result column="user_id" property="userId"/>
@@ -28,22 +28,22 @@
             <result column="position" property="position"/>
             <result column="start" property="start"/>
             <result column="departure" property="departure"/>
-        </collection>
+        </association>
     </resultMap>
 
     <select id="queryUserWorkByUserId" parameterType="basic" resultType="User" resultMap="workInfoMapper">
-        select
-            id,
-            nick_name,
-            real_name,
-            sex,
-            age,
-            work_id,
-            user_id,
-            company,
-            position,
-            start,
-            departure
+        select *
+<!--            id,-->
+<!--            nick_name,-->
+<!--            real_name,-->
+<!--            sex,-->
+<!--            age,-->
+<!--            work_id,-->
+<!--            user_id,-->
+<!--            company,-->
+<!--            position,-->
+<!--            start,-->
+<!--            departure-->
         from user, workinfo
         where id=user_id and id=#{id};
     </select>
