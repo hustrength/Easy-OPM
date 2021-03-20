@@ -2,7 +2,6 @@ package com.rsh.easy_opm;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 
 public class User implements Serializable {
     private int id;
@@ -15,26 +14,26 @@ public class User implements Serializable {
 
     private int age;
 
-    private WorkInfo workInfo;
+    private List<WorkInfo> workInfos;
 
     public User() {
     }
 
-    public WorkInfo getWorkInfo() {
+/*    public WorkInfo getWorkInfo() {
         return workInfo;
     }
 
     public void setWorkInfo(WorkInfo workInfo) {
         this.workInfo = workInfo;
-    }
+    }*/
 
-/*        public List<WorkInfo> getWorkInfos() {
+        public List<WorkInfo> getWorkInfos() {
         return workInfos;
     }
 
     public void setWorkInfos(List<WorkInfo> workInfos) {
         this.workInfos = workInfos;
-    }*/
+    }
 
     public int getId() {
         return id;
@@ -84,12 +83,12 @@ public class User implements Serializable {
                 ", realName='" + realName + '\'' +
                 ", sex='" + sex + '\'' +
                 ", age='" + age + '\'' +
-//                ",\n\tWorkInfos={" + printWorkInfo() + '}' +
-                ", workInfo='" + workInfo.toString() + '\'' +
+                ",\n\tWorkInfos={" + printWorkInfo() + '}' +
+//                ", workInfo='" + workInfo.toString() + '\'' +
                 '}';
     }
 
-    /*private String printWorkInfo() {
+    private String printWorkInfo() {
         if (workInfos == null)
             return null;
         StringBuilder result = new StringBuilder("");
@@ -98,5 +97,5 @@ public class User implements Serializable {
             result.append(workInfo.toString()).append(", ");
         }
         return result.substring(0, result.length() - 2);
-    }*/
+    }
 }

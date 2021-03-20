@@ -6,14 +6,13 @@ import com.rsh.easy_opm.reflection.ReflectionUtil;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class DefaultResultSetHandler implements ResultSetHandler {
-    private final MappedStatement mappedStatement;
+    private final MappedStatement ms;
 
-    public DefaultResultSetHandler(MappedStatement mappedStatement) {
-        this.mappedStatement = mappedStatement;
+    public DefaultResultSetHandler(MappedStatement ms) {
+        this.ms = ms;
     }
 
     @SuppressWarnings("unchecked")
@@ -21,12 +20,51 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     public <E> List<E> handleResultSet(ResultSet resultSet) throws SQLException {
         if (resultSet == null)
             return null;
-        List<E> ret = new ArrayList<>();
+        List<E> resultList = new ArrayList<>();
+        ReflectionUtil reflectionUtil = new ReflectionUtil(ms.getResultType(), ms.getResultMap(), resultSet);
         while (resultSet.next()) {
-            E entityClass = (E) ReflectionUtil.convertToBean(mappedStatement, resultSet);
+            E entityClass = (E) reflectionUtil.convertToBean();
             if (entityClass != null)
-                ret.add(entityClass);
+                resultList.add(entityClass);
         }
-        return ret;
+        return uniteCollectionClass(resultList);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <E> List<E> uniteCollectionClass(List<E> resultList) {
+        String collectionId = ms.getResultMapCollectionId();
+        String collectionProperty = ms.getCollectionProperty();
+        if (collectionId == null || collectionProperty == null)
+            return resultList;
+
+        Map<Object, E> unionMap = new HashMap<>();
+        try {
+            Class<E> entityClass = (Class<E>) Class.forName(ms.getResultType());
+            Field collectionIdField = entityClass.getDeclaredField(collectionId);
+            Field unitedField = entityClass.getDeclaredField(collectionProperty);
+            collectionIdField.setAccessible(true);
+            unitedField.setAccessible(true);
+
+            for (E entity :
+                    resultList) {
+                Object idValue = collectionIdField.get(entity);
+                if (!unionMap.containsKey(idValue)) {
+                    unionMap.put(idValue, entity);
+                } else {
+                    List source = (List) unitedField.get(entity);
+                    List target = (List) unitedField.get(unionMap.get(idValue));
+                    target.add(source.get(0));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Set<Object> keySet = unionMap.keySet();
+        resultList.clear();
+        for (Object key :
+                keySet) {
+            resultList.add(unionMap.get(key));
+        }
+        return resultList;
     }
 }

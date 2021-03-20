@@ -26,7 +26,7 @@ public class MapperBuilder {
         try {
             document = reader.read(resource);
         } catch (DocumentException e) {
-            System.out.println("Fail to load " + resource);
+            System.out.println("Some XML syntax errors in " + resource);
             e.printStackTrace();
         }
 
@@ -62,6 +62,8 @@ public class MapperBuilder {
                 // get resultMap and class chain of collection node in resultMap by resultMap ID
                 if (resultMap != null) {
                     mappedStatement.setResultMap(resultMapBuilder.getResultMap(resultMap));
+                    mappedStatement.setResultMapCollectionId(resultMapBuilder.getCollectionId());
+                    mappedStatement.setCollectionProperty(resultMapBuilder.getCollectionProperty(resultMap));
                 }
 
                 // parse Prepared Params #{...} in SQL

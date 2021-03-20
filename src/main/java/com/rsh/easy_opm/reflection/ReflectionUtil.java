@@ -1,22 +1,31 @@
 package com.rsh.easy_opm.reflection;
 
-import com.rsh.easy_opm.config.MappedStatement;
+import com.rsh.easy_opm.error.AssertError;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ReflectionUtil {
-    private static Map<String, String> resultMap;
-    private static ResultSet resultSet;
+    private final String resultType;
+    private final Map<String, String> resultMap;
+    private final ResultSet resultSet;
+
+    public ReflectionUtil(String resultType, Map<String, String> resultMap, ResultSet resultSet) {
+        this.resultType = resultType;
+        this.resultMap = resultMap;
+        this.resultSet = resultSet;
+    }
 
     @SuppressWarnings("unchecked")
-    public static <T> Object convertToBean(MappedStatement ms, ResultSet result) {
-        resultMap = ms.getResultMap();
-        resultSet = result;
+    public <T> Object convertToBean() {
         try {
-            Class<T> entityClass = (Class<T>) Class.forName(ms.getResultType());
+            Class<T> entityClass = (Class<T>) Class.forName(resultType);
             T entity = (T) entityClass.newInstance();
             Field[] declaredFields = entityClass.getDeclaredFields();
             for (Field field : declaredFields) {
@@ -32,7 +41,7 @@ public class ReflectionUtil {
         return null;
     }
 
-    private static String mapResult(String fieldName) {
+    private String mapResult(String fieldName) {
         if (resultMap == null)
             return fieldName;
         if (resultMap.containsKey(fieldName))
@@ -40,7 +49,7 @@ public class ReflectionUtil {
         else return fieldName;
     }
 
-    private static boolean existColumn(String columnName) {
+    private boolean existColumn(String columnName) {
         try {
             if (resultSet.findColumn(columnName) > 0) {
                 return true;
@@ -51,7 +60,7 @@ public class ReflectionUtil {
         return false;
     }
 
-    private static <T> void setField(Field field, String mappedName, T entity) throws Exception {
+    private <T> void setField(Field field, String mappedName, T entity) throws Exception {
         field.setAccessible(true);
 
         // do not set the field if not existing in resultSet
@@ -60,7 +69,7 @@ public class ReflectionUtil {
             case "Date":
                 if (existColumn(mappedName))
                     field.set(entity, resultSet.getDate(mappedName));
-                    break;
+                break;
             case "String":
                 if (existColumn(mappedName))
                     field.set(entity, resultSet.getString(mappedName));
@@ -82,13 +91,30 @@ public class ReflectionUtil {
                     field.set(entity, resultSet.getByte(mappedName));
                 break;
             default:
-                T entityValue = setEntity(field.getType().getName());
-                field.set(entity, entityValue);
+                // when the field type is the child class of Collection, set Collection Class to the field
+                if (List.class.isAssignableFrom(field.getType())) {
+                    // get the generic type of List and retrieve the element type
+                    String genericType = field.getGenericType().toString();
+                    String pattern = "<([^>]*)>";
+                    Pattern r = Pattern.compile(pattern);
+                    Matcher m = r.matcher(genericType);
+
+                    if (m.find()) {
+                        String entityType = m.group(1);
+                        T entityValue = setEntity(entityType);
+                        List<T> entityList = new ArrayList<>();
+                        entityList.add(entityValue);
+                        field.set(entity, entityList);
+                    } else AssertError.notMatchedError(false, genericType, "Regex\"" + pattern + '\"');
+                } else {
+                    T entityValue = setEntity(field.getType().getName());
+                    field.set(entity, entityValue);
+                }
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T setEntity(String classType) {
+    private <T> T setEntity(String classType) {
         try {
             Class<T> entityClass = (Class<T>) Class.forName(classType);
             T entity = (T) entityClass.newInstance();

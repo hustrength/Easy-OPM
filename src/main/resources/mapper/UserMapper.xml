@@ -1,5 +1,6 @@
 <mapper namespace="com.rsh.easy_opm.UserMapper">
     <resultMap id="ResultUser">
+        <id column="id" property="id"/>
         <result column="nick_name" property="nickName"/>
         <result column="real_name" property="realName"/>
     </resultMap>

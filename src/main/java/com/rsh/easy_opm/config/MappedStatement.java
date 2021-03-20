@@ -28,6 +28,10 @@ public class MappedStatement {
 
     private String paraType;
 
+    private String resultMapCollectionId;
+
+    private String collectionProperty;
+
     public String getNamespace() {
         return namespace;
     }
@@ -98,6 +102,22 @@ public class MappedStatement {
 
     public void setParaType(String paraType) {
         this.paraType = paraType;
+    }
+
+    public String getResultMapCollectionId() {
+        return resultMapCollectionId;
+    }
+
+    public void setResultMapCollectionId(String resultMapCollectionId) {
+        this.resultMapCollectionId = resultMapCollectionId;
+    }
+
+    public String getCollectionProperty() {
+        return collectionProperty;
+    }
+
+    public void setCollectionProperty(String collectionProperty) {
+        this.collectionProperty = collectionProperty;
     }
 
     @Override

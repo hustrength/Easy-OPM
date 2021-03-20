@@ -43,7 +43,7 @@ public class ConfigBuilder {
         try {
             document = reader.read(resource);
         } catch (DocumentException e) {
-            System.out.println("Fail to load " + resource);
+            System.out.println("Some XML syntax errors in " + resource);
             e.printStackTrace();
         }
 
