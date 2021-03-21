@@ -13,19 +13,17 @@ public class ResultMapBuilder {
     private final Map<String, String> collectionsId = new HashMap<>();
     private final Map<String, String> collectionsProperty = new HashMap<>();
 
-    public Map<String, String> getResultMap(String sourceID) {
-        AssertError.notFoundError(resultMaps.containsKey(sourceID), sourceID, "Result Maps");
-        return resultMaps.get(sourceID);
+    public Map<String, String> getResultMap(String sourceId) {
+        AssertError.notFoundError(resultMaps.containsKey(sourceId), "resultMap ID[" + sourceId + "]", "Known ResultMaps");
+        return resultMaps.get(sourceId);
     }
 
     public String getCollectionId(String sourceId) {
-        AssertError.notFoundError(collectionsId.containsKey(sourceId), sourceId, "collectionsId of resultMaps");
-        return collectionsId.get(sourceId);
+        return collectionsId.getOrDefault(sourceId, null);
     }
 
     public String getCollectionProperty(String sourceId) {
-        AssertError.notFoundError(collectionsProperty.containsKey(sourceId), sourceId, "collectionsProperty of resultMaps");
-        return collectionsProperty.get(sourceId);
+        return collectionsProperty.getOrDefault(sourceId, null);
     }
 
     public ResultMapBuilder(Element rootNode, Map<String, String> aliasMap) {
@@ -43,12 +41,16 @@ public class ResultMapBuilder {
             Map<String, String> resultMap = new HashMap<>();
 
             // parse id node
-            Element idNode = resultMapNode.element("id");
-            if (idNode != null) {
+            // only the 1st Id node will be parsed
+            List<Element> idNodes = resultMapNode.elements("id");
+            if (idNodes.size() == 1) {
+                Element idNode = idNodes.get(0);
                 String idColumn = idNode.attributeValue("column");
                 String idProperty = idNode.attributeValue("property");
                 resultMap.put(idProperty, idColumn);
                 collectionsId.put(id, idProperty);
+            } else if (idNodes.size() > 1){
+                AssertError.warning("Only the 1st Id node will be parsed");
             }
 
             // parse result node
@@ -61,6 +63,7 @@ public class ResultMapBuilder {
             }
 
             // parse association node
+            // NOTICE: Association Node is not allowed to iterate in Annotation setting but do in XML setting.
             List<Element> associations = resultMapNode.elements("association");
             for (Element association :
                     associations) {
@@ -69,10 +72,13 @@ public class ResultMapBuilder {
 
             // parse collection node
             // Collection is not allowed to be multiple, so only the 1st Collection node will be parsed
-            Element collection = resultMapNode.element("collection");
-            if (collection != null) {
-                    String collectionProperty = parseCollection(collection, resultMap);
+            List<Element> collections = resultMapNode.elements("collection");
+            if (collections.size() == 1) {
+                Element collection = collections.get(0);
+                String collectionProperty = parseCollection(collection, resultMap);
                 collectionsProperty.put(id, collectionProperty);
+            } else if (collections.size() > 1) {
+                AssertError.warning("Only the 1st Collection node will be parsed");
             }
 
             // put resultMap into resultMaps

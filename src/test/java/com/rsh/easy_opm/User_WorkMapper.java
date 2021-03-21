@@ -24,6 +24,7 @@ public interface User_WorkMapper {
             "where id=user_id and id=#{id}")
     @ParamType(Integer.class)
     @ResultType(User.class)
+    @ResultMapId("workInfoMapper")
     List<User> queryUserWorkByUserId(int id);
 
     User queryUserById(int id);

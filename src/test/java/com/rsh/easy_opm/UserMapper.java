@@ -6,33 +6,39 @@ import java.util.List;
 import java.util.Map;
 
 @Mapper
-@ResultMap(id="ResultUser", result = {
-        @Result(column = "nick_name", property = "nickName"),
-        @Result(column = "real_name", property = "realName")
-})
+@ResultMap(id = "ResultUser",
+        idNode = @ResultsId(column = "id", property = "id"),
+        result = {
+                @Result(column = "nick_name", property = "nickName"),
+                @Result(column = "real_name", property = "realName")
+        })
 public interface UserMapper {
     /**
      * 1. Select a User by primary key
+     *
      * @param id primary key
      * @return User
      */
     @Select("select * from user " +
             "where id = #{id};")
     @ParamType(Integer.class)
-//    @ResultMap("ResultUser")
     @ResultType(User.class)
+    @ResultMapId("ResultUser")
     User selectByPrimaryKey(int id);
 
     /**
      * 2. Select all Users
+     *
      * @return List<User>
      */
     @Select("select * from user")
     @ResultType(User.class)
+    @ResultMapId("ResultUser")
     List<User> selectAll();
 
     /**
      * 3. Insert User
+     *
      * @param user User Class
      */
     @Insert("insert into user " +
@@ -43,6 +49,7 @@ public interface UserMapper {
 
     /**
      * 4. Delete a User by primary key
+     *
      * @param id primary key
      */
     @Delete("delete from user " +
@@ -52,6 +59,7 @@ public interface UserMapper {
 
     /**
      * 5. Update a User
+     *
      * @param user User Class
      */
     @Update("update user " +
@@ -62,6 +70,7 @@ public interface UserMapper {
 
     /**
      * 6. Select Users by some conditions
+     *
      * @param map Map of conditions
      * @return List<User>
      */
