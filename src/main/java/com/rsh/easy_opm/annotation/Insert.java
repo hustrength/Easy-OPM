@@ -8,8 +8,6 @@ import java.lang.annotation.*;
 public @interface Insert {
     /**
      * Returns an SQL for retrieving record(s).
-     *
-     * @return an SQL for retrieving record(s)
      */
     String value();
 }

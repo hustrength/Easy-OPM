@@ -28,7 +28,7 @@ public class MappedStatement {
 
     private String paraType;
 
-    private String resultMapCollectionId;
+    private String CollectionId;
 
     private String collectionProperty;
 
@@ -104,12 +104,12 @@ public class MappedStatement {
         this.paraType = paraType;
     }
 
-    public String getResultMapCollectionId() {
-        return resultMapCollectionId;
+    public String getCollectionId() {
+        return CollectionId;
     }
 
-    public void setResultMapCollectionId(String resultMapCollectionId) {
-        this.resultMapCollectionId = resultMapCollectionId;
+    public void setCollectionId(String collectionId) {
+        this.CollectionId = collectionId;
     }
 
     public String getCollectionProperty() {
@@ -127,7 +127,13 @@ public class MappedStatement {
                 ", sourceId='" + sourceId + '\'' +
                 ", sql='" + sql + '\'' +
                 ", resultType='" + resultType + '\'' +
-                "\n, resultMap={" + printResultMap() + '}' +
+                ", commandType='" + commandType + '\'' +
+                ", preparedParamOrder=" + preparedParamOrder +
+                ", replacedParamOrder=" + replacedParamOrder +
+                ", paraType='" + paraType + '\'' +
+                ", resultMapCollectionId='" + CollectionId + '\'' +
+                ", collectionProperty='" + collectionProperty + '\'' +
+                "\n\t, resultMap={" + printResultMap() + '}' +
                 '}';
     }
 
@@ -143,9 +149,9 @@ public class MappedStatement {
     }
 
     public void checkMapperInfo() {
-        AssertError.notFoundError(namespace != null, "namespace", "Mapper[Source ID: "+ sourceId +']');
-        AssertError.notFoundError(sourceId != null, "id", "Mapper[Source ID: "+ sourceId +']');
-        AssertError.notFoundError(sql != null, "sql", "Mapper[Source ID: "+ sourceId +']');
+        AssertError.notFoundError(namespace != null, "namespace", "Mapper[Source ID: " + sourceId + ']');
+        AssertError.notFoundError(sourceId != null, "id", "Mapper[Source ID: " + sourceId + ']');
+        AssertError.notFoundError(sql != null, "sql", "Mapper[Source ID: " + sourceId + ']');
 
         // when paraType is not given, the preparedParamOrder must be null
         if (paraType == null)

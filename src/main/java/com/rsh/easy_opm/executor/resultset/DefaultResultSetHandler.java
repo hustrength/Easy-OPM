@@ -20,6 +20,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     public <E> List<E> handleResultSet(ResultSet resultSet) throws SQLException {
         if (resultSet == null)
             return null;
+//        System.out.println(ms.toString());
         List<E> resultList = new ArrayList<>();
         ReflectionUtil reflectionUtil = new ReflectionUtil(ms.getResultType(), ms.getResultMap(), resultSet);
         while (resultSet.next()) {
@@ -32,7 +33,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
     @SuppressWarnings("unchecked")
     private <E> List<E> uniteCollectionClass(List<E> resultList) {
-        String collectionId = ms.getResultMapCollectionId();
+        String collectionId = ms.getCollectionId();
         String collectionProperty = ms.getCollectionProperty();
         if (collectionId == null || collectionProperty == null)
             return resultList;

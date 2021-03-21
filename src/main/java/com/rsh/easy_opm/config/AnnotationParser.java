@@ -11,24 +11,70 @@ import java.util.Map;
 public class AnnotationParser {
     private final Map<String, Map<String, String>> resultMaps = new HashMap<>();
     private final Class<?> mapperInterface;
+    private final Map<String, String> collectionsId = new HashMap<>();
+    private final Map<String, String> collectionsProperty = new HashMap<>();
+
+    private Map<String, String> getResultMap(String sourceId) {
+        AssertError.notFoundError(resultMaps.containsKey(sourceId), "results ID[" + sourceId + "] from @ResultMap", "known resultMaps in " + mapperInterface.getName());
+        return resultMaps.get(sourceId);
+    }
+
+    private String getCollectionId(String sourceId) {
+        AssertError.notFoundError(collectionsId.containsKey(sourceId), "collection ID[" + sourceId + "] from @ResultMap", "known collectionsId in " + mapperInterface.getName());
+        return collectionsId.get(sourceId);
+    }
+
+    private String getCollectionProperty(String sourceId) {
+        AssertError.notFoundError(collectionsProperty.containsKey(sourceId), "collection property[" + sourceId + "] from @ResultMap", "known collectionsProperty in " + mapperInterface.getName());
+        return collectionsProperty.get(sourceId);
+    }
 
     public AnnotationParser(Class<?> mapperInterface) {
         this.mapperInterface = mapperInterface;
 
-        // parse @Results in advance
-        Method[] methods = mapperInterface.getDeclaredMethods();
-        for (Method method :
-                methods) {
-            if (method.isAnnotationPresent(Results.class)) {
-                Map<String, String> resultMap = new HashMap<>();
-                Results results = method.getAnnotation(Results.class);
-                Result[] resultList = results.value();
-                String resultsID = results.id();
+        // parse @ResultMap in advance
+        if (mapperInterface.isAnnotationPresent(ResultMaps.class)) {
+            Map<String, String> nameMapper = new HashMap<>();
+            ResultMaps results = mapperInterface.getAnnotation(ResultMaps.class);
+            for (ResultMap resultMap :
+                    results.value()) {
+                // get Id attribute of resultMap
+                String id = resultMap.id();
+
+                // parse Id node
+                ResultsId resultsIdNode = resultMap.idNode()[0];
+                // only the 1st Id node will be parsed
+                if (resultMap.idNode().length > 1)
+                    AssertError.warning("Only the 1st Id node will be parsed");
+                collectionsId.put(id, resultsIdNode.property());
+                nameMapper.put(resultsIdNode.property(), resultsIdNode.column());
+
+                // parse result node
+                Result[] resultList = resultMap.result();
                 for (Result result :
                         resultList) {
-                    resultMap.put(result.property(), result.column());
+                    nameMapper.put(result.property(), result.column());
                 }
-                resultMaps.put(resultsID, resultMap);
+
+                // parse collection node
+                Collection collection = resultMap.collection()[0];
+                // only the 1st Id node will be parsed
+                if (resultMap.idNode().length > 1)
+                    AssertError.warning("Only the 1st Collection node will be parsed");
+                String collectionProp = collection.property();
+                String collectionType = collection.ofType().getName();
+                String collectionCol = collection.column();
+                String collectionSelect = collection.select();
+                Result[] collectionResults = collection.result();
+                for (Result collectionResult :
+                        collectionResults) {
+                    // for union, (property@ofType, column) consists of resultMap
+                    // for normal result, (property, column) consists of resultMap
+                    nameMapper.put(collectionResult.property() + '@' + collectionType, collectionResult.column());
+                }
+                collectionsProperty.put(id, collectionProp);
+
+                resultMaps.put(id, nameMapper);
             }
         }
     }
@@ -82,25 +128,29 @@ public class AnnotationParser {
             foundAnnotation = true;
         }
 
-        if (method.isAnnotationPresent(Results.class)) {
-            if (method.isAnnotationPresent(ResultMap.class)) {
-                System.out.println();
-                System.out.println("\033[31m" + "WARNING: @Results and @ResultMap are both set in " + mapperInterface.getName() + ". Use @Results in priority" + "\033[0m");
-                System.out.println();
+        if (method.isAnnotationPresent(ResultMap.class)) {
+            if (method.isAnnotationPresent(ResultMapId.class)) {
+                AssertError.warning("@Results and @ResultMap are both set in " + mapperInterface.getName() + ". Use @Results in priority");
             }
-            Results results = method.getAnnotation(Results.class);
-            String resultsID = results.id();
-            AssertError.notFoundError(resultMaps.containsKey(resultsID), "resultsID from @ResultMap", "known resultMaps in " + mapperInterface.getName());
-            ms.setResultMap(resultMaps.get(resultsID));
-            foundAnnotation = true;
-        } else if (method.isAnnotationPresent(ResultMap.class)) {
+
             ResultMap resultMap = method.getAnnotation(ResultMap.class);
+            String resultsID = resultMap.id();
+            ms.setResultMap(getResultMap(resultsID));
+            ms.setCollectionId(getCollectionId(resultsID));
+            ms.setCollectionProperty(getCollectionProperty(resultsID));
+            foundAnnotation = true;
+        } else if (method.isAnnotationPresent(ResultMapId.class)) {
+
+            ResultMapId resultMap = method.getAnnotation(ResultMapId.class);
             String resultsID = resultMap.value();
-            AssertError.notFoundError(resultMaps.containsKey(resultsID), "resultsID from @ResultMap", "known resultMaps in " + mapperInterface.getName());
-            ms.setResultMap(resultMaps.get(resultsID));
+            ms.setResultMap(getResultMap(resultsID));
+            ms.setCollectionId(getCollectionId(resultsID));
+            ms.setCollectionProperty(getCollectionProperty(resultsID));
             foundAnnotation = true;
         }
 
+        ms.setNamespace(mapperInterface.getName());
+        ms.setSourceId(mapperInterface.getName() + '.' + method.getName());
         ms.checkMapperInfo();
 
         return foundAnnotation ? ms : null;

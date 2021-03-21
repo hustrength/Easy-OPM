@@ -75,9 +75,7 @@ public class MapperProxy<T> implements InvocationHandler {
 
             return true;
         } else {
-            System.out.println();
-            System.out.println("\033[31m" + "WARNING: XML and Annotation Mapper are both set. Use XML Mapper in priority" + "\033[0m");
-            System.out.println();
+            AssertError.warning("XML and Annotation Mapper are both set. Use XML Mapper in priority");
             return false;
         }
     }

@@ -32,4 +32,12 @@ public class AssertError {
     public static void notSupported(String source, String value) {
         assert false : source + '[' + value + "] not supported ";
     }
+
+    public static void notSupported(String source) {
+        assert false : source + " not supported ";
+    }
+
+    public static void warning(String statement) {
+        System.out.println("\n\033[31m" + "WARNING: " + statement + "\033[0m\n");
+    }
 }

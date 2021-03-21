@@ -35,17 +35,6 @@
 
     <select id="queryUserWorkByUserId" parameterType="basic" resultType="User" resultMap="workInfoMapper">
         select *
-<!--            id,-->
-<!--            nick_name,-->
-<!--            real_name,-->
-<!--            sex,-->
-<!--            age,-->
-<!--            work_id,-->
-<!--            user_id,-->
-<!--            company,-->
-<!--            position,-->
-<!--            start,-->
-<!--            departure-->
         from user, workinfo
         where id=user_id and id=#{id};
     </select>

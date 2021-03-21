@@ -19,6 +19,6 @@
     <!--    mapper file path-->
     <mappers>
 <!--        <mapper resource="mapper/UserMapper.xml"/>-->
-        <mapper resource="mapper/User_WorkMapper.xml"/>
+<!--        <mapper resource="mapper/User_WorkMapper.xml"/>-->
     </mappers>
 </configuration>

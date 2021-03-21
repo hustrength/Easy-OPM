@@ -47,7 +47,7 @@ public class MapperBuilder {
             List<Element> commands = rootNode.elements(commandType);
             for (Element element : commands) {
                 String id = element.attributeValue("id");
-                String sourceId = namespace + "." + id;
+                String sourceId = namespace + '.' + id;
                 String resultType = element.attributeValue("resultType");
                 String sql = element.getText();
                 String resultMap = element.attributeValue("resultMap");
@@ -62,7 +62,7 @@ public class MapperBuilder {
                 // get resultMap and class chain of collection node in resultMap by resultMap ID
                 if (resultMap != null) {
                     mappedStatement.setResultMap(resultMapBuilder.getResultMap(resultMap));
-                    mappedStatement.setResultMapCollectionId(resultMapBuilder.getCollectionId());
+                    mappedStatement.setCollectionId(resultMapBuilder.getCollectionId(resultMap));
                     mappedStatement.setCollectionProperty(resultMapBuilder.getCollectionProperty(resultMap));
                 }
 

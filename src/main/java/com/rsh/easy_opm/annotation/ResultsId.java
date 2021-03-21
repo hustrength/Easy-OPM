@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Result {
+public @interface ResultsId {
     /**
      * Return the column name(or column label) to map to this argument.
      */
@@ -16,5 +16,3 @@ public @interface Result {
      */
     String property() default "";
 }
-
-

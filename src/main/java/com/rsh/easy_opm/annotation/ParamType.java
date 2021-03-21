@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 public @interface ParamType {
     /**
-     * @return the type of parameters
+     * Returns the type of parameters
      */
     Class<?> value();
 }

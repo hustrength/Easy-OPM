@@ -5,9 +5,9 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Update {
+public @interface ResultMapId {
     /**
-     * Returns an SQL for retrieving record(s).
+     * Returns result map names to use.
      */
     String value();
 }

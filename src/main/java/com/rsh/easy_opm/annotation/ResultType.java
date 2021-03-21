@@ -8,8 +8,6 @@ import java.lang.annotation.*;
 public @interface ResultType {
     /**
      * Returns the return type.
-     *
-     * @return the return type
      */
     Class<?> value();
 }

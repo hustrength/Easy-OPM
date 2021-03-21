@@ -19,15 +19,7 @@ public class User implements Serializable {
     public User() {
     }
 
-/*    public WorkInfo getWorkInfo() {
-        return workInfo;
-    }
-
-    public void setWorkInfo(WorkInfo workInfo) {
-        this.workInfo = workInfo;
-    }*/
-
-        public List<WorkInfo> getWorkInfos() {
+    public List<WorkInfo> getWorkInfos() {
         return workInfos;
     }
 
@@ -84,17 +76,16 @@ public class User implements Serializable {
                 ", sex='" + sex + '\'' +
                 ", age='" + age + '\'' +
                 ",\n\tWorkInfos={" + printWorkInfo() + '}' +
-//                ", workInfo='" + workInfo.toString() + '\'' +
                 '}';
     }
 
     private String printWorkInfo() {
         if (workInfos == null)
             return null;
-        StringBuilder result = new StringBuilder("");
+        StringBuilder result = new StringBuilder("\n\t\t");
         for (WorkInfo workInfo :
                 workInfos) {
-            result.append(workInfo.toString()).append(", ");
+            result.append(workInfo.toString()).append(",\n\t\t");
         }
         return result.substring(0, result.length() - 2);
     }

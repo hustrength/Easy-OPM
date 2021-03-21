@@ -10,7 +10,7 @@ import java.util.Map;
 public class ResultMapBuilder {
     private final Map<String, Map<String, String>> resultMaps = new HashMap<>();
     private final Map<String, String> aliasMap;
-    private String collectionId;
+    private final Map<String, String> collectionsId = new HashMap<>();
     private final Map<String, String> collectionsProperty = new HashMap<>();
 
     public Map<String, String> getResultMap(String sourceID) {
@@ -18,13 +18,14 @@ public class ResultMapBuilder {
         return resultMaps.get(sourceID);
     }
 
-    public String getCollectionId() {
-        return collectionId;
+    public String getCollectionId(String sourceId) {
+        AssertError.notFoundError(collectionsId.containsKey(sourceId), sourceId, "collectionsId of resultMaps");
+        return collectionsId.get(sourceId);
     }
 
-    public String getCollectionProperty(String sourceID) {
-        AssertError.notFoundError(this.resultMaps.containsKey(sourceID), sourceID, "collectionsProperty of resultMaps");
-        return collectionsProperty.get(sourceID);
+    public String getCollectionProperty(String sourceId) {
+        AssertError.notFoundError(collectionsProperty.containsKey(sourceId), sourceId, "collectionsProperty of resultMaps");
+        return collectionsProperty.get(sourceId);
     }
 
     public ResultMapBuilder(Element rootNode, Map<String, String> aliasMap) {
@@ -36,6 +37,7 @@ public class ResultMapBuilder {
         List<Element> resultMapList = rootNode.elements("resultMap");
         for (Element resultMapNode :
                 resultMapList) {
+            // get id attribute of resultMap node
             String id = resultMapNode.attributeValue("id");
 
             Map<String, String> resultMap = new HashMap<>();
@@ -46,7 +48,7 @@ public class ResultMapBuilder {
                 String idColumn = idNode.attributeValue("column");
                 String idProperty = idNode.attributeValue("property");
                 resultMap.put(idProperty, idColumn);
-                collectionId = idProperty;
+                collectionsId.put(id, idProperty);
             }
 
             // parse result node
@@ -112,7 +114,7 @@ public class ResultMapBuilder {
                 resultList) {
             String column = resultNode.attributeValue("column");
             String property = resultNode.attributeValue("property");
-            // for association, (property@ofType, column) consists of resultMap
+            // for union, (property@ofType, column) consists of resultMap
             // for normal result, (property, column) consists of resultMap
             resultMap.put(property + '@' + ofType, column);
         }
