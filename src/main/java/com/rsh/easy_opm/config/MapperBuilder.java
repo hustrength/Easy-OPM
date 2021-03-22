@@ -59,11 +59,10 @@ public class MapperBuilder {
                 // build MappedStatement Class to store mapper info
                 MappedStatement mappedStatement = new MappedStatement();
 
-                // get resultMap and class chain of collection node in resultMap by resultMap ID
+                // get resultMap and union settings
                 if (resultMap != null) {
                     mappedStatement.setResultMap(resultMapBuilder.getResultMap(resultMap));
-                    mappedStatement.setCollectionId(resultMapBuilder.getCollectionId(resultMap));
-                    mappedStatement.setCollectionProperty(resultMapBuilder.getCollectionProperty(resultMap));
+                    mappedStatement.setResultMapUnion(resultMapBuilder.getUnion(resultMap));
                 }
 
                 // parse Prepared Params #{...} in SQL

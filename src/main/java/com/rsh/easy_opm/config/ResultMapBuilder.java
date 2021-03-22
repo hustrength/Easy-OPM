@@ -10,20 +10,15 @@ import java.util.Map;
 public class ResultMapBuilder {
     private final Map<String, Map<String, String>> resultMaps = new HashMap<>();
     private final Map<String, String> aliasMap;
-    private final Map<String, String> collectionsId = new HashMap<>();
-    private final Map<String, String> collectionsProperty = new HashMap<>();
+    private final Map<String, ResultMapUnion> unions = new HashMap<>();
 
     public Map<String, String> getResultMap(String sourceId) {
         AssertError.notFoundError(resultMaps.containsKey(sourceId), "resultMap ID[" + sourceId + "]", "Known ResultMaps");
         return resultMaps.get(sourceId);
     }
 
-    public String getCollectionId(String sourceId) {
-        return collectionsId.getOrDefault(sourceId, null);
-    }
-
-    public String getCollectionProperty(String sourceId) {
-        return collectionsProperty.getOrDefault(sourceId, null);
+    public ResultMapUnion getUnion(String sourceId) {
+        return unions.getOrDefault(sourceId, null);
     }
 
     public ResultMapBuilder(Element rootNode, Map<String, String> aliasMap) {
@@ -40,6 +35,8 @@ public class ResultMapBuilder {
 
             Map<String, String> resultMap = new HashMap<>();
 
+            ResultMapUnion union = new ResultMapUnion();
+
             // parse id node
             // only the 1st Id node will be parsed
             List<Element> idNodes = resultMapNode.elements("id");
@@ -48,7 +45,7 @@ public class ResultMapBuilder {
                 String idColumn = idNode.attributeValue("column");
                 String idProperty = idNode.attributeValue("property");
                 resultMap.put(idProperty, idColumn);
-                collectionsId.put(id, idProperty);
+                union.setCollectionId(idProperty);
             } else if (idNodes.size() > 1){
                 AssertError.warning("Only the 1st Id node will be parsed");
             }
@@ -67,7 +64,7 @@ public class ResultMapBuilder {
             List<Element> associations = resultMapNode.elements("association");
             for (Element association :
                     associations) {
-                parseAssociation(association, resultMap);
+                parseAssociation(association, resultMap, union);
             }
 
             // parse collection node
@@ -75,45 +72,54 @@ public class ResultMapBuilder {
             List<Element> collections = resultMapNode.elements("collection");
             if (collections.size() == 1) {
                 Element collection = collections.get(0);
-                String collectionProperty = parseCollection(collection, resultMap);
-                collectionsProperty.put(id, collectionProperty);
+                parseCollection(collection, resultMap, union);
             } else if (collections.size() > 1) {
                 AssertError.warning("Only the 1st Collection node will be parsed");
             }
 
             // put resultMap into resultMaps
             resultMaps.put(id, resultMap);
+            // put union into unions
+            unions.put(id, union);
         }
     }
 
-    private String parseCollection(Element ele, Map<String, String> resultMap) {
-        String property = ele.attributeValue("property");
-        parseUnion(ele, resultMap);
-        // Collection is not allowed to iterate
+    private void parseCollection(Element ele, Map<String, String> resultMap, ResultMapUnion union) {
 
-        return property;
+
+        parseUnion(ele, resultMap, union);
+        // Collection is not allowed to iterate
     }
 
-    private void parseAssociation(Element ele, Map<String, String> resultMap) {
+    private void parseAssociation(Element ele, Map<String, String> resultMap, ResultMapUnion union) {
         // do not need to use the result: ofType
-        parseUnion(ele, resultMap);
+        parseUnion(ele, resultMap, union);
 
         // continue to parse association
         List<Element> associations = ele.elements("association");
         for (Element association :
                 associations) {
-            parseAssociation(association, resultMap);
+            parseAssociation(association, resultMap, union);
         }
     }
 
-    private void parseUnion(Element ele, Map<String, String> resultMap) {
+    private void parseUnion(Element ele, Map<String, String> resultMap, ResultMapUnion union) {
         if (ele == null)
             return;
-        String ofType = ele.attributeValue("ofType");
-
+        String ofTypeAttr = ele.attributeValue("ofType");
         // replace alias with real type
-        if (aliasMap.containsKey(ofType))
-            ofType = aliasMap.get(ofType);
+        if (aliasMap.containsKey(ofTypeAttr))
+            ofTypeAttr = aliasMap.get(ofTypeAttr);
+
+        // set select Attr and column Attr
+        String selectAttr = ele.attributeValue("select");
+        String columnAttr = ele.attributeValue("column");
+        String propertyAttr = ele.attributeValue("property");
+
+        union.setUnionOfType(ofTypeAttr);
+        union.setUnionSelect(selectAttr);
+        union.setUnionColumn(columnAttr);
+        union.setUnionProperty(propertyAttr);
 
         List<Element> resultList = ele.elements("result");
         for (Element resultNode :
@@ -122,7 +128,7 @@ public class ResultMapBuilder {
             String property = resultNode.attributeValue("property");
             // for union, (property@ofType, column) consists of resultMap
             // for normal result, (property, column) consists of resultMap
-            resultMap.put(property + '@' + ofType, column);
+            resultMap.put(property + '@' + ofTypeAttr, column);
         }
     }
 }

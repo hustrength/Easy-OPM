@@ -12,4 +12,11 @@ public interface SqlSession {
     <T> T selectOne(String sourceID, Object[] parameter);
 
     <E> List<E> selectList(String sourceID, Object[] parameter);
+
+    Class<?> getMapperInterface();
+
+    Object getProxy();
+
+    void setProxy(Object proxy);
+
 }

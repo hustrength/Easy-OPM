@@ -28,7 +28,8 @@ public class ReplacedParameterHandler implements ParameterHandler {
         // when paramOrder is not null, the paramType must be map
         AssertError.notMatchedError(paramType.equals("map"), "Using replaced params ${...}, paramType", paramType, "specified paramType", "map");
 
-        CheckMapParameter.check(paramOrder, parameter);
+        CheckParameter.checkMap(parameter);
+        CheckParameter.checkBasic(parameter);
         Map<String, Object> map = (Map<String, Object>) parameter[0];
         String pattern = "\\$\\{([^#{}]*)}";
         Pattern r = Pattern.compile(pattern);

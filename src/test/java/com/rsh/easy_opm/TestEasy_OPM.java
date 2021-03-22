@@ -4,8 +4,7 @@ import com.rsh.easy_opm.sqlsession.SqlSession;
 import com.rsh.easy_opm.sqlsession.SqlSessionFactory;
 import org.junit.Test;
 
-import javax.print.DocFlavor;
-import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class TestEasy_OPM {
@@ -47,20 +46,20 @@ public class TestEasy_OPM {
 //        System.out.println(userMapper.selectByPrimaryKey(4));
 //        System.out.println();
 
-        System.out.println("UserMapper.selecetByConditions():");
-        Map<String, Object> map = new HashMap<>();
-        map.put("column1", "id");
-        map.put("value1", 2);
-        map.put("column2", "age");
-        map.put("value2", 20);
-        map.put("column3", "sex");
-        map.put("value3", true);
-        userList = userMapper.selectByConditions(map);
-        for (User user1 :
-                userList) {
-            System.out.println(user1.toString());
-        }
-        System.out.println();
+//        System.out.println("UserMapper.selecetByConditions():");
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("column1", "id");
+//        map.put("value1", 2);
+//        map.put("column2", "age");
+//        map.put("value2", 20);
+//        map.put("column3", "sex");
+//        map.put("value3", true);
+//        userList = userMapper.selectByConditions(map);
+//        for (User user1 :
+//                userList) {
+//            System.out.println(user1.toString());
+//        }
+//        System.out.println();
 
 
 //        System.out.println("UserMapper.updateOne():");
@@ -73,11 +72,21 @@ public class TestEasy_OPM {
 //        userMapper.updateOne(user);
 //        System.out.println("OK");
 
-//        User_WorkMapper user_workMapper = sqlSession.getMapper(User_WorkMapper.class);
-//        List<User> results = user_workMapper.queryUserWorkByUserId(4);
-//        for (User result :
-//                results) {
+        User_WorkMapper user_workMapper = sqlSession.getMapper(User_WorkMapper.class);
+//        User result = user_workMapper.queryUserWorkByUserId(4);
+//        try {
+//            Method method = User_WorkMapper.class.getDeclaredMethod("queryUserWorkByUserId", int.class);
+//            Object result = method.invoke(user_workMapper, 4);
 //            System.out.println(result.toString());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        User result = user_workMapper.queryUserById(4);
+        System.out.println(result.toString());
+//        List<WorkInfo> result = user_workMapper.queryWorkById(4);
+//        for (WorkInfo workinfo :
+//                result) {
+//            System.out.println(workinfo.toString());
 //        }
     }
 }

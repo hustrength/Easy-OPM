@@ -15,11 +15,13 @@ public class ReflectionUtil {
     private final String resultType;
     private final Map<String, String> resultMap;
     private final ResultSet resultSet;
+    private final String unionOfType;
 
-    public ReflectionUtil(String resultType, Map<String, String> resultMap, ResultSet resultSet) {
+    public ReflectionUtil(String resultType, String unionOfType, Map<String, String> resultMap, ResultSet resultSet) {
         this.resultType = resultType;
         this.resultMap = resultMap;
         this.resultSet = resultSet;
+        this.unionOfType = unionOfType;
     }
 
     @SuppressWarnings("unchecked")
@@ -44,9 +46,7 @@ public class ReflectionUtil {
     private String mapResult(String fieldName) {
         if (resultMap == null)
             return fieldName;
-        if (resultMap.containsKey(fieldName))
-            return resultMap.get(fieldName);
-        else return fieldName;
+        return resultMap.getOrDefault(fieldName, fieldName);
     }
 
     private boolean existColumn(String columnName) {
@@ -93,19 +93,10 @@ public class ReflectionUtil {
             default:
                 // when the field type is the child class of Collection, set Collection Class to the field
                 if (List.class.isAssignableFrom(field.getType())) {
-                    // get the generic type of List and retrieve the element type
-                    String genericType = field.getGenericType().toString();
-                    String pattern = "<([^>]*)>";
-                    Pattern r = Pattern.compile(pattern);
-                    Matcher m = r.matcher(genericType);
-
-                    if (m.find()) {
-                        String entityType = m.group(1);
-                        T entityValue = setEntity(entityType);
-                        List<T> entityList = new ArrayList<>();
-                        entityList.add(entityValue);
-                        field.set(entity, entityList);
-                    } else AssertError.notMatchedError(false, genericType, "Regex\"" + pattern + '\"');
+                    T entityValue = setEntity(unionOfType);
+                    List<T> entityList = new ArrayList<>();
+                    entityList.add(entityValue);
+                    field.set(entity, entityList);
                 } else {
                     T entityValue = setEntity(field.getType().getName());
                     field.set(entity, entityValue);

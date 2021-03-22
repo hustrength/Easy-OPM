@@ -7,8 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PreparedParameterHandler implements ParameterHandler {
 
@@ -26,7 +24,7 @@ public class PreparedParameterHandler implements ParameterHandler {
         }
         switch (paramType) {
             case "map": {
-                CheckMapParameter.check(paramOrder, parameter);
+                CheckParameter.checkMap(parameter);
                 Map<String, Object> map = (Map<String, Object>) parameter[0];
                 Object[] mappedParam = new Object[paramOrder.size()];
                 for (int i = 0; i < paramOrder.size(); i++) {
@@ -38,10 +36,7 @@ public class PreparedParameterHandler implements ParameterHandler {
                 break;
             }
             case "basic": {
-                // judge if Para1 is Number Type or String Type
-                boolean paramTypeMatched = parameter.length == 1 && (parameter[0] instanceof Number || parameter[0] instanceof String);
-                AssertError.notMatchedError(paramTypeMatched, "Para", parameter[0].getClass().getSimpleName(), "paraType", "basic");
-
+                CheckParameter.checkBasic(parameter);
                 setMappedParam(preparedStatement, parameter);
                 break;
             }

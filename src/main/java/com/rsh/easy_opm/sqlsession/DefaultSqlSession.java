@@ -15,16 +15,19 @@ public class DefaultSqlSession implements SqlSession{
 
     private Connection conn;
     private Executor executor;
+    private Class<?> mapperInterface;
+    private Object proxy;
 
 
     public DefaultSqlSession(Configuration config, Connection conn) {
         this.config = config;
         this.conn = conn;
-        this.executor = new BaseExecutor(this.conn);
+        this.executor = new BaseExecutor(this.conn, this);
     }
 
     @Override
     public <T> T getMapper(Class<T> type) {
+        mapperInterface = type;
         return config.getMapper(type, this);
     }
 
@@ -38,16 +41,32 @@ public class DefaultSqlSession implements SqlSession{
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <E> List<E> selectList(String sourceID, Object[] parameter) {
         MappedStatement mappedStatement = config.queryMappedStatement(sourceID);
         AssertError.notMatchedError(mappedStatement != null, "Mapper source id", sourceID);
         try {
-            return executor.query(mappedStatement, parameter);
+            return executor.query(mappedStatement, parameter, (Class<E>) mapperInterface);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public Class<?> getMapperInterface() {
+        return mapperInterface;
+    }
+
+    @Override
+    public Object getProxy() {
+        return proxy;
+    }
+
+    @Override
+    public void setProxy(Object proxy) {
+        this.proxy = proxy;
     }
 
     public Configuration getConfig() {

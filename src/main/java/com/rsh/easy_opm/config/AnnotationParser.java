@@ -11,20 +11,16 @@ import java.util.Map;
 public class AnnotationParser {
     private final Map<String, Map<String, String>> resultMaps = new HashMap<>();
     private final Class<?> mapperInterface;
-    private final Map<String, String> collectionsId = new HashMap<>();
-    private final Map<String, String> collectionsProperty = new HashMap<>();
+    private final Map<String, ResultMapUnion> unions = new HashMap<>();
+
 
     private Map<String, String> getResultMap(String sourceId) {
         AssertError.notFoundError(resultMaps.containsKey(sourceId), "resultMap ID[" + sourceId + "] from @ResultMap", "known resultMaps in " + mapperInterface.getName());
         return resultMaps.get(sourceId);
     }
 
-    private String getCollectionId(String sourceId) {
-        return collectionsId.getOrDefault(sourceId, null);
-    }
-
-    private String getCollectionProperty(String sourceId) {
-        return collectionsProperty.getOrDefault(sourceId, null);
+    public ResultMapUnion getUnion(String sourceId) {
+        return unions.getOrDefault(sourceId, null);
     }
 
     public AnnotationParser(Class<?> mapperInterface) {
@@ -57,10 +53,12 @@ public class AnnotationParser {
         AssertError.notFoundError(resultMap.idNode().length != 0, "idNode", "@resultMap in " + mapperInterface.getName());
         ResultsId resultsIdNode = resultMap.idNode()[0];
 
+        ResultMapUnion union = new ResultMapUnion();
+
         // only the 1st Id node will be parsed
         if (resultMap.idNode().length > 1)
             AssertError.warning("Only the 1st Id node will be parsed");
-        collectionsId.put(id, resultsIdNode.property());
+        union.setCollectionId(resultsIdNode.property());
         nameMapper.put(resultsIdNode.property(), resultsIdNode.column());
 
         // parse result node
@@ -72,28 +70,34 @@ public class AnnotationParser {
 
         // parse collection node
         if (resultMap.collection().length != 0) {
-            String collectionProp = parseCollection(nameMapper, resultMap);
-            collectionsProperty.put(id, collectionProp);
+            parseCollection(nameMapper, resultMap, union);
         }
 
         // parse association node
         if (resultMap.association().length != 0){
-            parseAssociation(nameMapper, resultMap);
+            parseAssociation(nameMapper, resultMap, union);
         }
 
         resultMaps.put(id, nameMapper);
+        unions.put(id, union);
     }
 
-    private String parseCollection(Map<String, String> nameMapper, ResultMap resultMap){
+    private void parseCollection(Map<String, String> nameMapper, ResultMap resultMap, ResultMapUnion union){
         // only the 1st Collection node will be parsed
         if (resultMap.collection().length > 1)
             AssertError.warning("Only the 1st Collection node will be parsed");
 
         Collection collection = resultMap.collection()[0];
-        String collectionProp = collection.property();
         String collectionType = collection.ofType().getName();
-        String collectionCol = collection.column();
+        String collectionProp = collection.property();
         String collectionSelect = collection.select();
+        String collectionCol = collection.column();
+
+        union.setUnionOfType(collectionType);
+        union.setUnionProperty(collectionProp);
+        union.setUnionSelect(collectionSelect);
+        union.setUnionColumn(collectionCol);
+
         Result[] collectionResults = collection.result();
         for (Result collectionResult :
                 collectionResults) {
@@ -101,17 +105,22 @@ public class AnnotationParser {
             // for normal result, (property, column) consists of resultMap
             nameMapper.put(collectionResult.property() + '@' + collectionType, collectionResult.column());
         }
-        return collectionProp;
     }
 
-    private void parseAssociation(Map<String, String> nameMapper, ResultMap resultMap){
+    private void parseAssociation(Map<String, String> nameMapper, ResultMap resultMap, ResultMapUnion union){
         Association[] associations = resultMap.association();
         for (Association association :
                 associations) {
             String associationProp = association.property();
             String associationType = association.ofType().getName();
-            String associationCol = association.column();
             String associationSelect = association.select();
+            String associationCol = association.column();
+
+            union.setUnionProperty(associationProp);
+            union.setUnionOfType(associationType);
+            union.setUnionSelect(associationSelect);
+            union.setUnionColumn(associationCol);
+
             Result[] associationResults = association.result();
             for (Result associationResult :
                     associationResults) {
@@ -175,8 +184,7 @@ public class AnnotationParser {
             ResultMapId resultMap = method.getAnnotation(ResultMapId.class);
             String resultsID = resultMap.value();
             ms.setResultMap(getResultMap(resultsID));
-            ms.setCollectionId(getCollectionId(resultsID));
-            ms.setCollectionProperty(getCollectionProperty(resultsID));
+            ms.setResultMapUnion(getUnion(resultsID));
             foundAnnotation = true;
         }
 

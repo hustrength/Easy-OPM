@@ -16,12 +16,10 @@ import java.util.Collection;
 public class MapperProxy<T> implements InvocationHandler {
 
     private final SqlSession sqlSession;
-
     private final Class<T> mapperInterface;
-
     private final Configuration config;
-
     private final AnnotationParser annotationParser;
+    private T proxy;
 
     MapperProxy(SqlSession sqlSession, Class<T> mapperInterface) {
         this.sqlSession = sqlSession;
@@ -30,7 +28,11 @@ public class MapperProxy<T> implements InvocationHandler {
         this.annotationParser = new AnnotationParser(mapperInterface);
     }
 
-    @SuppressWarnings("unchecked")
+    public void setProxy(T proxy) {
+        this.proxy = proxy;
+        sqlSession.setProxy(proxy);
+    }
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
@@ -75,7 +77,7 @@ public class MapperProxy<T> implements InvocationHandler {
 
             return true;
         } else {
-            AssertError.warning("XML and Annotation Mapper are both set. Use XML Mapper in priority");
+            AssertError.warning("For Method[" + method.toString() + "],\n\t\t" + "XML and Annotation Mapper are both set. Use XML Mapper in priority");
             return false;
         }
     }

@@ -4,6 +4,7 @@ import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.executor.parameter.*;
 import com.rsh.easy_opm.executor.resultset.*;
 import com.rsh.easy_opm.executor.statement.*;
+import com.rsh.easy_opm.sqlsession.SqlSession;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,13 +14,15 @@ import java.util.List;
 
 public class BaseExecutor implements Executor {
     Connection conn;
+    SqlSession sqlSession;
 
-    public BaseExecutor(Connection conn) {
+    public BaseExecutor(Connection conn, SqlSession sqlSession) {
         this.conn = conn;
+        this.sqlSession = sqlSession;
     }
 
     @Override
-    public <E> List<E> query(MappedStatement ms, Object[] parameter) throws SQLException {
+    public <E> List<E> query(MappedStatement ms, Object[] parameter, Class<E> mapperInterface) throws SQLException {
         // Instantiate ReplacedParameterHandler Class
         ParameterHandler replacedParamHandler = new ReplacedParameterHandler(ms.getSql());
 
@@ -34,7 +37,7 @@ public class BaseExecutor implements Executor {
         PreparedStatement preparedStatement = statementHandler.prepare(conn);
 
         // Instantiate PreparedParameterHandler Class
-        ParameterHandler preparedParamHandler = new PreparedParameterHandler(preparedStatement );
+        ParameterHandler preparedParamHandler = new PreparedParameterHandler(preparedStatement);
 
         // Set prepared parameters
         preparedParamHandler.setParameters(ms.getParaType(), ms.getPreparedParamOrder(), parameter);
@@ -43,7 +46,7 @@ public class BaseExecutor implements Executor {
         ResultSet resultSet = statementHandler.execute(preparedStatement);
 
         // Instantiate ResultSetHandler Class and convert result to POJO
-        ResultSetHandler resultSetHandler = new DefaultResultSetHandler(ms);
+        ResultSetHandler resultSetHandler = new DefaultResultSetHandler(ms, sqlSession);
 
         // Get SQL result
         List<E> result = resultSetHandler.handleResultSet(resultSet);

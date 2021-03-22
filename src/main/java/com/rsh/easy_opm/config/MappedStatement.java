@@ -28,9 +28,7 @@ public class MappedStatement {
 
     private String paraType;
 
-    private String CollectionId;
-
-    private String collectionProperty;
+    private ResultMapUnion resultMapUnion;
 
     public String getNamespace() {
         return namespace;
@@ -104,20 +102,12 @@ public class MappedStatement {
         this.paraType = paraType;
     }
 
-    public String getCollectionId() {
-        return CollectionId;
+    public ResultMapUnion getResultMapUnion() {
+        return resultMapUnion;
     }
 
-    public void setCollectionId(String collectionId) {
-        this.CollectionId = collectionId;
-    }
-
-    public String getCollectionProperty() {
-        return collectionProperty;
-    }
-
-    public void setCollectionProperty(String collectionProperty) {
-        this.collectionProperty = collectionProperty;
+    public void setResultMapUnion(ResultMapUnion resultMapUnion) {
+        this.resultMapUnion = resultMapUnion;
     }
 
     @Override
@@ -131,8 +121,7 @@ public class MappedStatement {
                 ", preparedParamOrder=" + preparedParamOrder +
                 ", replacedParamOrder=" + replacedParamOrder +
                 ", paraType='" + paraType + '\'' +
-                ", resultMapCollectionId='" + CollectionId + '\'' +
-                ", collectionProperty='" + collectionProperty + '\'' +
+                ", resultMapUnion={" + resultMapUnion + '}' +
                 "\n\t, resultMap={" + printResultMap() + '}' +
                 '}';
     }

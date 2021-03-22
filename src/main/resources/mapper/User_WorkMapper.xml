@@ -23,7 +23,7 @@
         <result column="nick_name" property="nickName"/>
         <result column="real_name" property="realName"/>
         <association property="workInfos" ofType="WorkInfo"
-                    select="queryWorkById" column="work_id">
+                    select="queryWorkById" column="id">
             <result column="work_id" property="workId"/>
             <result column="user_id" property="userId"/>
             <result column="company" property="company"/>
@@ -31,6 +31,12 @@
             <result column="start" property="start"/>
             <result column="departure" property="departure"/>
         </association>
+    </resultMap>
+
+    <resultMap id="ResultWork">
+        <id column="id" property="id"/>
+        <result column="work_id" property="workId"/>
+        <result column="user_id" property="userId"/>
     </resultMap>
 
     <select id="queryUserWorkByUserId" parameterType="basic" resultType="User" resultMap="workInfoMapper">
@@ -50,7 +56,7 @@
         where id=#{id};
     </select>
 
-    <select id="queryWorkById" parameterType="basic" resultType="WorkInfo">
+    <select id="queryWorkById" parameterType="basic" resultType="WorkInfo" resultMap="ResultWork">
         select
             work_id,
             user_id,
@@ -59,6 +65,6 @@
             start,
             departure
         from workinfo
-        where work_id=#{id}
+        where user_id=#{id}
     </select>
 </mapper>
