@@ -23,6 +23,8 @@ public class BaseExecutor implements Executor {
 
     @Override
     public <E> List<E> query(MappedStatement ms, Object[] parameter, Class<E> mapperInterface) throws SQLException {
+        System.out.println("Start to execute SQL: " + ms.getSourceId() + " >>>");
+
         // Instantiate ReplacedParameterHandler Class
         ParameterHandler replacedParamHandler = new ReplacedParameterHandler(ms.getSql());
 

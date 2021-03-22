@@ -10,7 +10,7 @@ public @interface ResultMap {
     /**
      * Returns the id of this result map.
      */
-    String id() default "";
+    String id();
 
     /**
      * Returns mapping definitions for property.

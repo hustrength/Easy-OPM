@@ -19,7 +19,6 @@ public class MapperProxy<T> implements InvocationHandler {
     private final Class<T> mapperInterface;
     private final Configuration config;
     private final AnnotationParser annotationParser;
-    private T proxy;
 
     MapperProxy(SqlSession sqlSession, Class<T> mapperInterface) {
         this.sqlSession = sqlSession;
@@ -28,8 +27,7 @@ public class MapperProxy<T> implements InvocationHandler {
         this.annotationParser = new AnnotationParser(mapperInterface);
     }
 
-    public void setProxy(T proxy) {
-        this.proxy = proxy;
+    public void setProxyToSqlsession(T proxy) {
         sqlSession.setProxy(proxy);
     }
 

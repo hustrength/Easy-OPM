@@ -1,5 +1,6 @@
 package com.rsh.easy_opm;
 
+import com.rsh.easy_opm.error.AssertError;
 import com.rsh.easy_opm.sqlsession.SqlSession;
 import com.rsh.easy_opm.sqlsession.SqlSessionFactory;
 import org.junit.Test;
@@ -81,13 +82,11 @@ public class TestEasy_OPM {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
+        AssertError.setWarningOn(false);
+
         User result = user_workMapper.queryUserById(4);
         System.out.println(result.toString());
-//        List<WorkInfo> result = user_workMapper.queryWorkById(4);
-//        for (WorkInfo workinfo :
-//                result) {
-//            System.out.println(workinfo.toString());
-//        }
+
     }
 }
 

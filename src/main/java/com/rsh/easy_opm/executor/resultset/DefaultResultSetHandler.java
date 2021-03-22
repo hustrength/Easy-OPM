@@ -33,6 +33,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         ResultMapUnion union = ms.getResultMapUnion();
         String select = union != null ? union.getUnionSelect() : null;
         String column = union != null ? union.getUnionColumn() : null;
+        String property = union != null ? union.getUnionProperty() : null;
         String unionOfType = union != null ? ms.getResultMapUnion().getUnionOfType() : null;
 
         Map<String, String> resultMap = ms.getResultMap();
@@ -43,23 +44,22 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             E entityClass = (E) reflectionUtil.convertToBean();
 
             // when select != null && column != null, conduct multiple steps query
-            if (select != null && column != null)
+            if (select != null && column != null && property != null)
                 entityClass = multipleStepQuery(entityClass, union);
 
             if (entityClass != null)
                 resultList.add(entityClass);
         }
-        return executeUnion(resultList);
+        return executeUnion(resultList, union);
     }
 
     @SuppressWarnings("unchecked")
-    private <E> List<E> executeUnion(List<E> resultList) {
-        ResultMapUnion union = ms.getResultMapUnion();
+    private <E> List<E> executeUnion(List<E> resultList, ResultMapUnion union) {
         String id = union != null ? union.getCollectionId() : null;
         String property = union != null ? union.getUnionProperty() : null;
 
-        // when id==null || property==null, the union node does not exist or only association exist
-        if (id == null || property == null)
+        // when id==null, the union node does not exist or only association exist
+        if (id == null)
             return resultList;
 
         // collection node exists, so unite results to one collection class
@@ -99,6 +99,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     private <E> E multipleStepQuery(E formerQueryResult, ResultMapUnion union) {
         if (formerQueryResult == null)
             return null;
+        String id = union.getCollectionId();
         String property = union.getUnionProperty();
         String select = union.getUnionSelect();
         String column = union.getUnionColumn();
@@ -123,15 +124,15 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             nextStepQueryMethod.setAccessible(true);
 
             // check if next query return type is matched with designated type in union
-            if (List.class.isAssignableFrom(nextStepQueryMethod.getReturnType())){
+            if (List.class.isAssignableFrom(nextStepQueryMethod.getReturnType())) {
                 String nextReturnType = nextStepQueryMethod.getGenericReturnType().getTypeName();
                 String regex = "<([^>]*)>";
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(nextReturnType);
-                if (m.find()){
+                if (m.find()) {
                     AssertError.notMatchedError(m.group(1).equals(ofType), "The return type of next step query method", nextReturnType, "designated return type in union", ofType);
                 }
-            }else {
+            } else {
                 String nextReturnType = nextStepQueryMethod.getReturnType().getName();
                 AssertError.notMatchedError(nextReturnType.equals(ofType), "The return type of next step query method", nextReturnType, "designated return type in union", ofType);
             }
@@ -141,6 +142,10 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
             // execute next SQL query
             Object param = nextStepQueryParam.get(formerQueryResult);
+
+            // when the ext query returns null, return former query result
+            if (param == null)
+                return formerQueryResult;
 
             Object nextQueryResult = null;
             if (param instanceof Number || param instanceof String) {
@@ -156,7 +161,14 @@ public class DefaultResultSetHandler implements ResultSetHandler {
                 if (nextQueryResult instanceof List) {
                     List collectionList = (List) propertyField.get(formerQueryResult);
                     collectionList.clear();
-                    collectionList.addAll((List<Object>) nextQueryResult);
+
+                    // The next query returns a List, but the union is an association. So only fetch the 1st element of the List.
+                    if (id == null) {
+                        collectionList.add(((List<Object>)nextQueryResult).get(0));
+                        AssertError.warning("Next query returns a List, but the union is an association. So only fetch the 1st element of the List.");
+                    } else {
+                        collectionList.addAll((List<Object>) nextQueryResult);
+                    }
                 } else {
                     propertyField.set(formerQueryResult, nextQueryResult);
                 }

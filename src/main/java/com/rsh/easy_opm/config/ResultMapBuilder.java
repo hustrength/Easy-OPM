@@ -45,8 +45,11 @@ public class ResultMapBuilder {
                 String idColumn = idNode.attributeValue("column");
                 String idProperty = idNode.attributeValue("property");
                 resultMap.put(idProperty, idColumn);
-                union.setCollectionId(idProperty);
-            } else if (idNodes.size() > 1){
+
+                // only when collection node exists, assign the collectionId
+                if (resultMapNode.element("collection") != null)
+                    union.setCollectionId(idProperty);
+            } else if (idNodes.size() > 1) {
                 AssertError.warning("Only the 1st Id node will be parsed");
             }
 

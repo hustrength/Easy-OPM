@@ -1,6 +1,16 @@
 package com.rsh.easy_opm.error;
 
 public class AssertError {
+    public static boolean WARNING_ON = true;
+
+    public static boolean isWarningOn() {
+        return WARNING_ON;
+    }
+
+    public static void setWarningOn(boolean warningOn) {
+        WARNING_ON = warningOn;
+    }
+
     public static void notFoundError(boolean found, String target) {
         assert found : target + " not found";
     }
@@ -38,6 +48,7 @@ public class AssertError {
     }
 
     public static void warning(String statement) {
-        System.out.println("\n\033[31m" + "WARNING: " + statement + "\033[0m\n");
+        if (WARNING_ON)
+            System.out.println("\n\033[31m" + "WARNING: " + statement + "\033[0m\n");
     }
 }

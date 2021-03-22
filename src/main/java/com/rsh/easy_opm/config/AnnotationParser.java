@@ -49,18 +49,6 @@ public class AnnotationParser {
         // get Id attribute of resultMap
         String id = resultMap.id();
 
-        // parse Id node
-        AssertError.notFoundError(resultMap.idNode().length != 0, "idNode", "@resultMap in " + mapperInterface.getName());
-        ResultsId resultsIdNode = resultMap.idNode()[0];
-
-        ResultMapUnion union = new ResultMapUnion();
-
-        // only the 1st Id node will be parsed
-        if (resultMap.idNode().length > 1)
-            AssertError.warning("Only the 1st Id node will be parsed");
-        union.setCollectionId(resultsIdNode.property());
-        nameMapper.put(resultsIdNode.property(), resultsIdNode.column());
-
         // parse result node
         Result[] resultList = resultMap.result();
         for (Result result :
@@ -68,8 +56,20 @@ public class AnnotationParser {
             nameMapper.put(result.property(), result.column());
         }
 
-        // parse collection node
+        ResultMapUnion union = new ResultMapUnion();
+
         if (resultMap.collection().length != 0) {
+            // only when collection node exists, parse Id node
+            AssertError.notFoundError(resultMap.idNode().length != 0, "idNode", "@resultMap in " + mapperInterface.getName());
+            ResultsId resultsIdNode = resultMap.idNode()[0];
+
+            // only the 1st Id node will be parsed
+            if (resultMap.idNode().length > 1)
+                AssertError.warning("Only the 1st Id node will be parsed");
+            nameMapper.put(resultsIdNode.property(), resultsIdNode.column());
+            union.setCollectionId(resultsIdNode.property());
+
+            // parse collection node
             parseCollection(nameMapper, resultMap, union);
         }
 
