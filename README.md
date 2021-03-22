@@ -1,1 +1,1 @@
- A lightweight ORM framework for Java
+ A lightweight OPM framework for Java
