@@ -26,6 +26,7 @@ public class ReflectionUtil {
 
     @SuppressWarnings("unchecked")
     public <T> Object convertToBean() {
+        boolean entityNotNull = false;
         try {
             Class<T> entityClass = (Class<T>) Class.forName(resultType);
             T entity = (T) entityClass.newInstance();
@@ -33,10 +34,10 @@ public class ReflectionUtil {
             for (Field field : declaredFields) {
                 String fieldName = field.getName();
                 String mappedName = mapResult(fieldName);
-
-                setField(field, mappedName, entity);
+                if (setField(field, mappedName, entity))
+                    entityNotNull = true;
             }
-            return entity;
+            return entityNotNull ? entity : null;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -60,52 +61,105 @@ public class ReflectionUtil {
         return false;
     }
 
-    private <T> void setField(Field field, String mappedName, T entity) throws Exception {
+    private <T> boolean setField(Field field, String mappedName, T entity) throws Exception {
         field.setAccessible(true);
 
         // do not set the field if not existing in resultSet
         String fieldType = field.getType().getSimpleName();
+        boolean haveSet = false;
         switch (fieldType) {
             case "Date":
-                if (existColumn(mappedName))
+                if (existColumn(mappedName)) {
+                    haveSet = true;
                     field.set(entity, resultSet.getDate(mappedName));
+                }
                 break;
             case "String":
-                if (existColumn(mappedName))
+                if (existColumn(mappedName)) {
+                    haveSet = true;
                     field.set(entity, resultSet.getString(mappedName));
+                }
                 break;
+            case "Integer":
             case "int":
-                if (existColumn(mappedName))
+                if (existColumn(mappedName)) {
+                    haveSet = true;
                     field.set(entity, resultSet.getInt(mappedName));
+                }
                 break;
+            case "Boolean":
             case "boolean":
-                if (existColumn(mappedName))
+                if (existColumn(mappedName)) {
+                    haveSet = true;
                     field.set(entity, resultSet.getBoolean(mappedName));
+                }
                 break;
+            case "Float":
             case "float":
-                if (existColumn(mappedName))
+                if (existColumn(mappedName)) {
+                    haveSet = true;
                     field.set(entity, resultSet.getFloat(mappedName));
+                }
                 break;
+            case "Character":
             case "char":
-                if (existColumn(mappedName))
+                if (existColumn(mappedName)) {
+                    haveSet = true;
+                    field.set(entity, resultSet.getString(mappedName).charAt(0));
+                }
+                break;
+            case "Byte":
+            case "byte":
+                if (existColumn(mappedName)) {
+                    haveSet = true;
                     field.set(entity, resultSet.getByte(mappedName));
+                }
+                break;
+            case "Short":
+            case "short":
+                if (existColumn(mappedName)) {
+                    haveSet = true;
+                    field.set(entity, resultSet.getShort(mappedName));
+                }
+                break;
+            case "Long":
+            case "long":
+                if (existColumn(mappedName)) {
+                    haveSet = true;
+                    field.set(entity, resultSet.getLong(mappedName));
+                }
+                break;
+            case "Double":
+            case "double":
+                if (existColumn(mappedName)) {
+                    haveSet = true;
+                    field.set(entity, resultSet.getDouble(mappedName));
+                }
                 break;
             default:
                 // when the field type is the child class of Collection, set Collection Class to the field
                 if (List.class.isAssignableFrom(field.getType())) {
                     T entityValue = setEntity(unionOfType);
                     List<T> entityList = new ArrayList<>();
-                    entityList.add(entityValue);
-                    field.set(entity, entityList);
+                    if (entityValue != null) {
+                        haveSet = true;
+                        entityList.add(entityValue);
+                        field.set(entity, entityList);
+                    }
                 } else {
                     T entityValue = setEntity(field.getType().getName());
-                    field.set(entity, entityValue);
+                    if (entityValue != null) {
+                        haveSet = true;
+                        field.set(entity, entityValue);
+                    }
                 }
         }
+        return haveSet;
     }
 
     @SuppressWarnings("unchecked")
     private <T> T setEntity(String classType) {
+        boolean entityNotNull = false;
         try {
             Class<T> entityClass = (Class<T>) Class.forName(classType);
             T entity = (T) entityClass.newInstance();
@@ -113,10 +167,10 @@ public class ReflectionUtil {
             for (Field field : declaredFields) {
                 String fieldName = field.getName() + '@' + classType;
                 String mappedName = mapResult(fieldName);
-
-                setField(field, mappedName, entity);
+                if (setField(field, mappedName, entity))
+                    entityNotNull = true;
             }
-            return entity;
+            return entityNotNull ? entity : null;
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -24,7 +24,7 @@ import java.util.List;
         result = {
                 @Result(column = "nick_name", property = "nickName"),
                 @Result(column = "real_name", property = "realName")},
-        association = @Association(property = "workInfos", ofType = WorkInfo.class,
+        collection = @Collection(property = "workInfos", ofType = WorkInfo.class,
                 select = "queryWorkById", column = "id",
                 result = {
                         @Result(column = "work_id", property = "work_id"),

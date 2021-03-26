@@ -75,18 +75,19 @@ public class User implements Serializable {
                 ", realName='" + realName + '\'' +
                 ", sex='" + sex + '\'' +
                 ", age='" + age + '\'' +
-                ",\n\tWorkInfos={" + printWorkInfo() + '}' +
+                ",\n\tWorkInfos=" + printWorkInfo() +
                 '}';
     }
 
     private String printWorkInfo() {
         if (workInfos == null)
             return null;
-        StringBuilder result = new StringBuilder("\n\t\t");
+        StringBuilder result = new StringBuilder("{\n\t\t");
         for (WorkInfo workInfo :
                 workInfos) {
             result.append(workInfo.toString()).append(",\n\t\t");
         }
-        return result.substring(0, result.length() - 2);
+        result.delete(result.length() - 2, result.length());
+        return result.append('}').toString();
     }
 }

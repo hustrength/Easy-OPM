@@ -43,7 +43,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         while (resultSet.next()) {
             E entityClass = (E) reflectionUtil.convertToBean();
 
-            // when select != null && column != null, conduct multiple steps query
+            // conduct multiple steps query
             if (select != null && column != null && property != null)
                 entityClass = multipleStepQuery(entityClass, union);
 
@@ -79,8 +79,12 @@ public class DefaultResultSetHandler implements ResultSetHandler {
                 } else {
                     List source = (List) unitedField.get(entity);
                     List target = (List) unitedField.get(unionMap.get(idValue));
-                    AssertError.notFoundError(source.size() != 0, "Collection Class is null, so cannot unite Collection");
-                    target.add(source.get(0));
+                    if (source != null) {
+                        AssertError.notFoundError(source.size() != 0, "Collection Class is null, so cannot unite Collection");
+                        Object sourceObj = source.get(0);
+                        if (sourceObj != null)
+                            target.add(sourceObj);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -144,8 +148,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             Object param = nextStepQueryParam.get(formerQueryResult);
 
             // when the ext query returns null, return former query result
-            if (param == null)
+            if (param == null) {
                 return formerQueryResult;
+            }
 
             Object nextQueryResult = null;
             if (param instanceof Number || param instanceof String) {
@@ -164,7 +169,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
                     // The next query returns a List, but the union is an association. So only fetch the 1st element of the List.
                     if (id == null) {
-                        collectionList.add(((List<Object>)nextQueryResult).get(0));
+                        collectionList.add(((List<Object>) nextQueryResult).get(0));
                         AssertError.warning("Next query returns a List, but the union is an association. So only fetch the 1st element of the List.");
                     } else {
                         collectionList.addAll((List<Object>) nextQueryResult);

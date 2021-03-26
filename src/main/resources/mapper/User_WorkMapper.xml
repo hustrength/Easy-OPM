@@ -22,7 +22,7 @@
         <id column="id" property="id"/>
         <result column="nick_name" property="nickName"/>
         <result column="real_name" property="realName"/>
-        <association property="workInfos" ofType="WorkInfo"
+        <collection property="workInfos" ofType="WorkInfo"
                     select="queryWorkById" column="id">
             <result column="work_id" property="workId"/>
             <result column="user_id" property="userId"/>
@@ -30,7 +30,7 @@
             <result column="position" property="position"/>
             <result column="start" property="start"/>
             <result column="departure" property="departure"/>
-        </association>
+        </collection>
     </resultMap>
 
     <resultMap id="ResultWork">
@@ -41,6 +41,12 @@
 
     <select id="queryUserWorkByUserId" parameterType="basic" resultType="User" resultMap="workInfoMapper">
         select *
+<!--        select-->
+<!--            id,-->
+<!--            nick_name,-->
+<!--            real_name,-->
+<!--            sex,-->
+<!--            age-->
         from user, workinfo
         where id=user_id and id=#{id};
     </select>

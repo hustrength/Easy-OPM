@@ -5,6 +5,7 @@ import com.rsh.easy_opm.error.AssertError;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +72,8 @@ public class PreparedParameterHandler implements ParameterHandler {
                 preparedStatement.setByte(i + 1, (byte) param[i]);
             } else if (param[i] instanceof Boolean) {
                 preparedStatement.setBoolean(i + 1, (boolean) param[i]);
+            } else if (param[i] instanceof Date) {
+                preparedStatement.setDate(i+1, (Date) param[i]);
             }
         }
     }
