@@ -105,6 +105,8 @@ public class JsonMapper {
     }
 
     private <T> T readValue(String json, Class<T> entityClass) throws Exception {
+        if (json.equals("null"))
+            return null;
         T entity = (T) entityClass.newInstance();
         Field[] fields = entityClass.getDeclaredFields();
 

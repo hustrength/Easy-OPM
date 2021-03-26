@@ -158,23 +158,36 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             } else
                 AssertError.notSupported("The parameter of next query[" + nextStepQueryMethod.getName() + ']', param.getClass().getName());
 
-            // If the propertyField type equals to ofType, the union is association. Otherwise it is collection.
-            if (propertyField.getType().getName().equals(ofType)) {
-                propertyField.set(formerQueryResult, nextQueryResult);
-            }// if the union is collection and the propertyField Class is List
-            else if (List.class.isAssignableFrom(propertyField.getType())) {
-                if (nextQueryResult instanceof List) {
-                    List collectionList = (List) propertyField.get(formerQueryResult);
-                    collectionList.clear();
+            // if the propertyField Class is List
+            if (List.class.isAssignableFrom(propertyField.getType())) {
+                List<Object> collectionList = new ArrayList<>();
 
+                // if the next query returns a List
+                if (nextQueryResult instanceof List) {
+
+                    // If the propertyField type equals to ofType, the union must be an association. Otherwise it is a collection.
                     // The next query returns a List, but the union is an association. So only fetch the 1st element of the List.
-                    if (id == null) {
+                    if (propertyField.getType().getName().equals(ofType)) {
                         collectionList.add(((List<Object>) nextQueryResult).get(0));
                         AssertError.warning("Next query returns a List, but the union is an association. So only fetch the 1st element of the List.");
                     } else {
                         collectionList.addAll((List<Object>) nextQueryResult);
                     }
-                } else {
+                }
+                // if the next query returns a single entity
+                else {
+                    collectionList.add(nextQueryResult);
+                }
+                propertyField.set(formerQueryResult, collectionList);
+            }
+            // if the propertyField Class is a single entity
+            else {
+                // The next query returns a List, but the field type is a single entity. So only fetch the 1st element of the List.
+                if (nextQueryResult instanceof List) {
+                    Object singleEntity = ((List<Object>) nextQueryResult).get(0);
+                    AssertError.warning("Next query returns a List, but the type of the field[" + propertyField.getName() + "] is a single entity. So only fetch the 1st element of the List.");
+                    propertyField.set(formerQueryResult, singleEntity);
+                }else {
                     propertyField.set(formerQueryResult, nextQueryResult);
                 }
             }

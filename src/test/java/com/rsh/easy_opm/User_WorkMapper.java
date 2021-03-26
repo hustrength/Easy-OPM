@@ -39,8 +39,10 @@ import java.util.List;
         @Result(column = "user_id", property = "userId")})
 public interface User_WorkMapper {
     /**
-     * @param id
-     * @return
+     * 1. Select a User with WorkInfo by primary key in one-step query
+     *
+     * @param id primary key of User
+     * @return User
      */
     @Select("select * from user, workinfo " +
             "where id=user_id and id=#{id}")
@@ -50,7 +52,9 @@ public interface User_WorkMapper {
     User queryUserWorkByUserId(int id);
 
     /**
-     * @param id
+     * 2. Select a User with WorkInfo by primary key in two-step query
+     *
+     * @param id primary key of User
      * @return
      */
     @Select("select * from user " +
@@ -61,8 +65,10 @@ public interface User_WorkMapper {
     User queryUserById(int id);
 
     /**
-     * @param id
-     * @return
+     * 3. Select a WorkInfo by primary key of User in one-step query
+     *
+     * @param id primary key of User
+     * @return List<WorkInfo>
      */
     @Select("select * from workinfo " +
             "where user_id=#{id}")
