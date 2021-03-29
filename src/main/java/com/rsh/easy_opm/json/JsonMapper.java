@@ -36,6 +36,8 @@ public class JsonMapper {
         OVERIDE_ON = overideOn;
     }
 
+    /* public methods */
+
     public <T> T readValueFromString(String json, Class<T> entityClass) {
         String parsedJson = json.replaceAll("\\s", "");
         try {
@@ -59,13 +61,11 @@ public class JsonMapper {
         }
 
         byte[] fileContent = new byte[(int) fileLength];
-        try {
-            FileInputStream in = new FileInputStream(file);
+        try (FileInputStream in = new FileInputStream(file)){
             if (in.read(fileContent) == -1) {
                 AssertError.warning("Fail to read value from a file, because the file[" + file.toString() + "] is empty");
                 return null;
             }
-            in.close();
 
             String contentString = new String(fileContent);
             String parsedJson = contentString.replaceAll("\\s", "");
@@ -82,10 +82,8 @@ public class JsonMapper {
             return;
         }
 
-        try {
-            PrintWriter output = new PrintWriter(file);
+        try (PrintWriter output = new PrintWriter(file)){
             output.println(writeValueAsString(obj));
-            output.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -104,6 +102,8 @@ public class JsonMapper {
         return null;
     }
 
+    /* private methods */
+
     private <T> T readValue(String json, Class<T> entityClass) throws Exception {
         if (json.equals("null"))
             return null;
@@ -112,7 +112,7 @@ public class JsonMapper {
 
         // regex for matching the whole entity
         String attribute = "\"([_a-zA-Z][_a-zA-Z0-9]*)\"";
-        String collectionValue = "(\\[(.*)])";
+        String collectionValue = "\\[(.*)]";
         String numberValue = "([^,\"}]*)";
         String stringValue = "\"([^,\"}]*)\"";
         String entityValue = "\\{([^,\"}]*)}";
@@ -132,12 +132,15 @@ public class JsonMapper {
                 field.setAccessible(true);
                 String fieldName = m.group(1);
                 String fieldValue = m.group(2);
+                String collectionVal = m.group(3);
+                String stringVal = m.group(5);
 
-                // extract actual value from String or Collection
-                if (fieldValue.charAt(0) == '"' && fieldValue.charAt(fieldValue.length() - 1) == '"')
-                    fieldValue = fieldValue.substring(1, fieldValue.length() - 1);
-                else if (fieldValue.charAt(0) == '[' && fieldValue.charAt(fieldValue.length() - 1) == ']')
-                    fieldValue = fieldValue.substring(1, fieldValue.length() - 1);
+                // extract actual value from Collection
+                if (collectionVal != null)
+                    fieldValue = collectionVal;
+                // extract actual value from String
+                else if (stringVal != null)
+                    fieldValue = stringVal;
 
                 if (!fieldValue.equals("null")) {
                     if (!fieldName.equals(field.getName())) {

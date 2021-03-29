@@ -1,6 +1,9 @@
 package com.rsh.easy_opm.sqlsession;
 
 import com.rsh.easy_opm.config.Configuration;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,7 +16,7 @@ public class ConnectionBuilder {
         this.config = config;
     }
 
-    public Connection getConnection() {
+    public Connection getRDConnection() {
         Connection conn = null;
         try {
             Class.forName(config.getDbDriver());
@@ -23,5 +26,10 @@ public class ConnectionBuilder {
             e.printStackTrace();
         }
         return conn;
+    }
+
+    public Driver getGDConnection() {
+        return GraphDatabase.driver(config.getDbDriver(),
+                AuthTokens.basic(config.getDbUserName(), config.getDbPassword()));
     }
 }

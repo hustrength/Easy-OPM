@@ -5,6 +5,7 @@ import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.error.AssertError;
 import com.rsh.easy_opm.executor.BaseExecutor;
 import com.rsh.easy_opm.executor.Executor;
+import org.neo4j.driver.Driver;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -14,6 +15,7 @@ public class DefaultSqlSession implements SqlSession{
     private Configuration config;
 
     private Connection conn;
+    private Driver driver;
     private Executor executor;
     private Class<?> mapperInterface;
     private Object proxy;
@@ -23,6 +25,12 @@ public class DefaultSqlSession implements SqlSession{
         this.config = config;
         this.conn = conn;
         this.executor = new BaseExecutor(this.conn, this);
+    }
+
+    public DefaultSqlSession(Configuration config, Driver driver) {
+        this.config = config;
+        this.driver = driver;
+//        this.executor = new BaseExecutor(this.driver, this);
     }
 
     @Override

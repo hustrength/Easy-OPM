@@ -27,7 +27,7 @@ public class MapperProxy<T> implements InvocationHandler {
         this.annotationParser = new AnnotationParser(mapperInterface);
     }
 
-    public void setProxyToSqlsession(T proxy) {
+    public void setProxyToSqlSession(T proxy) {
         sqlSession.setProxy(proxy);
     }
 

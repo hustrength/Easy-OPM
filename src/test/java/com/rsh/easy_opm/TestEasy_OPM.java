@@ -13,7 +13,7 @@ public class TestEasy_OPM {
     @Test
     public void test() {
         SqlSessionFactory factory = new SqlSessionFactory();
-        SqlSession sqlSession = factory.getSession();
+        SqlSession sqlSession = factory.getSession(SqlSessionFactory.DB_Type.RD);
 
         User_WorkMapper user_workMapper = sqlSession.getMapper(User_WorkMapper.class);
 
@@ -24,11 +24,11 @@ public class TestEasy_OPM {
             System.out.println(result.toString());
 
         JsonMapper jsonMapper = new JsonMapper();
-        System.out.println("\nMy POJ to json mapper:");
-//        JsonMapper.setIndentOn(true);
-        System.out.println(jsonMapper.writeValueAsString(result));
-
+        JsonMapper.setIndentOn(true);
         JsonMapper.setOverideOn(true);
+
+        System.out.println("\nMy POJ to json mapper:");
+        System.out.println(jsonMapper.writeValueAsString(result));
 
         jsonMapper.writeValueAsFile(new File("1.txt"), result);
 
