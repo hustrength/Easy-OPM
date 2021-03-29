@@ -2,6 +2,8 @@ package com.rsh.easy_opm.config;
 
 import com.rsh.easy_opm.binding.MapperProxyFactory;
 import com.rsh.easy_opm.error.AssertError;
+import com.rsh.easy_opm.sqlsession.BasicSession;
+import com.rsh.easy_opm.sqlsession.CqlSession;
 import com.rsh.easy_opm.sqlsession.SqlSession;
 
 import java.util.HashMap;
@@ -24,8 +26,8 @@ public class Configuration {
     private final Map<String, MappedStatement> mappedStatements = new HashMap<>();
 
     // create dynamic proxy for mapper
-    public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
-        return MapperProxyFactory.getMapperProxy(sqlSession, type);
+    public <T> T getMapper(Class<T> type, BasicSession session) {
+        return MapperProxyFactory.getMapperProxy(session, type);
     }
 
     public MappedStatement queryMappedStatement(String sourceID) {

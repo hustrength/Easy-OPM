@@ -88,7 +88,7 @@ public class MapperBuilder {
                 mappedStatement.setReplacedParamOrder(replacedParamOrder);
                 mappedStatement.setNamespace(namespace);
                 mappedStatement.setSourceId(sourceId);
-                mappedStatement.setSql(sql);
+                mappedStatement.setQueryStr(sql);
                 mappedStatement.setCommandType(commandType);
 
                 mappedStatement.checkMapperInfo();

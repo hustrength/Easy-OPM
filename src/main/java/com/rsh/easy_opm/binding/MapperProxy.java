@@ -6,7 +6,7 @@ import com.rsh.easy_opm.config.Configuration;
 import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.error.AssertError;
 import com.rsh.easy_opm.sqlsession.DefaultSqlSession;
-import com.rsh.easy_opm.sqlsession.SqlSession;
+import com.rsh.easy_opm.sqlsession.BasicSession;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -15,20 +15,20 @@ import java.util.Collection;
 
 public class MapperProxy<T> implements InvocationHandler {
 
-    private final SqlSession sqlSession;
+    private final BasicSession session;
     private final Class<T> mapperInterface;
     private final Configuration config;
     private final AnnotationParser annotationParser;
 
-    MapperProxy(SqlSession sqlSession, Class<T> mapperInterface) {
-        this.sqlSession = sqlSession;
+    MapperProxy(BasicSession session, Class<T> mapperInterface) {
+        this.session = session;
         this.mapperInterface = mapperInterface;
-        this.config = ((DefaultSqlSession) sqlSession).getConfig();
+        this.config = ((DefaultSqlSession) session).getConfig();
         this.annotationParser = new AnnotationParser(mapperInterface);
     }
 
-    public void setProxyToSqlSession(T proxy) {
-        sqlSession.setProxy(proxy);
+    public void setProxyToSession(T proxy) {
+        session.setProxy(proxy);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class MapperProxy<T> implements InvocationHandler {
         Class<?> returnType = method.getReturnType();
         Object ret;
 
-        // invoke different methods in SqlSession according to different return types
+        // invoke different methods in BasicSession according to different return types
         String sourceID = mapperInterface.getName() + "." + method.getName();
 
         // if using annotation to set mapper, generate MappedStatement from annotation
@@ -54,9 +54,9 @@ public class MapperProxy<T> implements InvocationHandler {
         }
 
         if (isCollection(returnType)) {
-            ret = sqlSession.selectList(sourceID, args);
+            ret = session.selectList(sourceID, args);
         } else {
-            ret = sqlSession.selectOne(sourceID, args);
+            ret = session.selectOne(sourceID, args);
         }
 
         return ret;

@@ -2,7 +2,7 @@ package com.rsh.easy_opm.sqlsession;
 
 import java.util.List;
 
-public interface SqlSession extends BasicSession{
+public interface CqlSession extends BasicSession{
     // get Mapper Interface provided by Binding Module
     <T> T getMapper(Class<T> type);
 
@@ -10,10 +10,5 @@ public interface SqlSession extends BasicSession{
 
     <E> List<E> selectList(String sourceID, Object[] parameter);
 
-    Class<?> getMapperInterface();
-
-    Object getProxy();
-
     void setProxy(Object proxy);
-
 }

@@ -3,31 +3,35 @@ package com.rsh.easy_opm.executor.resultset;
 import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.config.ResultMapUnion;
 import com.rsh.easy_opm.error.AssertError;
+import com.rsh.easy_opm.reflection.RdReflectionUtil;
 import com.rsh.easy_opm.reflection.ReflectionUtil;
 import com.rsh.easy_opm.sqlsession.SqlSession;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.sql.Date;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DefaultResultSetHandler implements ResultSetHandler {
+public class SqlResultSetHandler implements ResultSetHandler {
     private final MappedStatement ms;
     private final SqlSession sqlSession;
 
-    public DefaultResultSetHandler(MappedStatement ms, SqlSession sqlSession) {
+    public SqlResultSetHandler(MappedStatement ms, SqlSession sqlSession) {
         this.ms = ms;
         this.sqlSession = sqlSession;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <E> List<E> handleResultSet(ResultSet resultSet) throws SQLException {
-        if (resultSet == null)
+    public <E> List<E> handleResultSet(Object result) throws Exception {
+        if (result == null)
             return null;
+
+        ResultSet resultSet = (ResultSet) result;
+
         String resultType = ms.getResultType();
 
         ResultMapUnion union = ms.getResultMapUnion();
@@ -37,14 +41,14 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         String unionOfType = union != null ? ms.getResultMapUnion().getUnionOfType() : null;
 
         Map<String, String> resultMap = ms.getResultMap();
-        ReflectionUtil reflectionUtil = new ReflectionUtil(resultType, unionOfType, resultMap, resultSet);
+        ReflectionUtil reflectionUtil = new RdReflectionUtil(resultType, unionOfType, resultMap, resultSet);
 
         List<E> resultList = new ArrayList<>();
         while (resultSet.next()) {
             E entityClass = (E) reflectionUtil.convertToBean();
 
             // conduct multiple steps query
-            if (select != null && column != null && property != null)
+            if (select != null && column != null && property != null && unionOfType != null)
                 entityClass = multipleStepQuery(entityClass, union);
 
             if (entityClass != null)
@@ -117,7 +121,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
                 nextStepQueryParam = entityClass.getDeclaredField(column);
                 nextStepQueryParam.setAccessible(true);
             } catch (NoSuchFieldException e) {
-                AssertError.notFoundError(false, "Union column attribute[" + column + ']', "Field names of " + mapperInterface.getName());
+                AssertError.notFoundError(false, "Union column attribute[" + column + ']',
+                        "Field names of " + mapperInterface.getName());
                 e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -134,11 +139,15 @@ public class DefaultResultSetHandler implements ResultSetHandler {
                 Pattern p = Pattern.compile(regex);
                 Matcher m = p.matcher(nextReturnType);
                 if (m.find()) {
-                    AssertError.notMatchedError(m.group(1).equals(ofType), "The return type of next step query method", nextReturnType, "designated return type in union", ofType);
+                    AssertError.notMatchedError(m.group(1).equals(ofType),
+                            "The return type of next step query method", nextReturnType,
+                            "designated return type in union", ofType);
                 }
             } else {
                 String nextReturnType = nextStepQueryMethod.getReturnType().getName();
-                AssertError.notMatchedError(nextReturnType.equals(ofType), "The return type of next step query method", nextReturnType, "designated return type in union", ofType);
+                AssertError.notMatchedError(nextReturnType.equals(ofType),
+                        "The return type of next step query method", nextReturnType,
+                        "designated return type in union", ofType);
             }
             // the field that nextQueryResult will be assigned to
             Field propertyField = entityClass.getDeclaredField(property);
@@ -153,7 +162,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             }
 
             Object nextQueryResult = null;
-            if (param instanceof Number || param instanceof String) {
+            if (param instanceof Number || param instanceof String || param instanceof Date
+                    || param instanceof Boolean || param instanceof Character) {
                 nextQueryResult = nextStepQueryMethod.invoke(sqlSession.getProxy(), param);
             } else
                 AssertError.notSupported("The parameter of next query[" + nextStepQueryMethod.getName() + ']', param.getClass().getName());
@@ -187,7 +197,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
                     Object singleEntity = ((List<Object>) nextQueryResult).get(0);
                     AssertError.warning("Next query returns a List, but the type of the field[" + propertyField.getName() + "] is a single entity. So only fetch the 1st element of the List.");
                     propertyField.set(formerQueryResult, singleEntity);
-                }else {
+                } else {
                     propertyField.set(formerQueryResult, nextQueryResult);
                 }
             }

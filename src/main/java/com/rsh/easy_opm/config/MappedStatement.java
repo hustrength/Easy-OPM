@@ -12,7 +12,7 @@ public class MappedStatement {
 
     private String sourceId;
 
-    private String sql;
+    private String queryStr;
 
     private String resultType;
 
@@ -46,12 +46,12 @@ public class MappedStatement {
         this.sourceId = sourceId;
     }
 
-    public String getSql() {
-        return sql;
+    public String getQueryStr() {
+        return queryStr;
     }
 
-    public void setSql(String sql) {
-        this.sql = sql;
+    public void setQueryStr(String queryStr) {
+        this.queryStr = queryStr;
     }
 
     public String getResultType() {
@@ -115,7 +115,7 @@ public class MappedStatement {
         return "MappedStatement{" +
                 "namespace='" + namespace + '\'' +
                 ", sourceId='" + sourceId + '\'' +
-                ", sql='" + sql + '\'' +
+                ", sql='" + queryStr + '\'' +
                 ", resultType='" + resultType + '\'' +
                 ", commandType='" + commandType + '\'' +
                 ", preparedParamOrder=" + preparedParamOrder +
@@ -140,7 +140,7 @@ public class MappedStatement {
     public void checkMapperInfo() {
         AssertError.notFoundError(namespace != null, "namespace", "Mapper[Source ID: " + sourceId + ']');
         AssertError.notFoundError(sourceId != null, "id", "Mapper[Source ID: " + sourceId + ']');
-        AssertError.notFoundError(sql != null, "sql", "Mapper[Source ID: " + sourceId + ']');
+        AssertError.notFoundError(queryStr != null, "sql", "Mapper[Source ID: " + sourceId + ']');
 
         // when paraType is not given, the preparedParamOrder must be null
         if (paraType == null)

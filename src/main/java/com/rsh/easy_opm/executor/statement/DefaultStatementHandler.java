@@ -17,7 +17,7 @@ public class DefaultStatementHandler implements StatementHandler{
 
     @Override
     public PreparedStatement prepare(Connection connection) throws SQLException {
-        return connection.prepareStatement(mappedStatment.getSql());
+        return connection.prepareStatement(mappedStatment.getQueryStr());
     }
 
     @Override

@@ -5,6 +5,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface ResultSetHandler {
-    <E> List<E> handleResultSet(ResultSet resultSet) throws SQLException;
+    <E> List<E> handleResultSet(Object resultSet) throws Exception;
 
 }

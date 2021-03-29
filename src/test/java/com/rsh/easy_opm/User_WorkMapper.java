@@ -25,15 +25,7 @@ import java.util.List;
                 @Result(column = "nick_name", property = "nickName"),
                 @Result(column = "real_name", property = "realName")},
         collection = @Collection(property = "workInfos", ofType = WorkInfo.class,
-                select = "queryWorkById", column = "id",
-                result = {
-                        @Result(column = "work_id", property = "work_id"),
-                        @Result(column = "user_id", property = "user_id"),
-                        @Result(column = "company", property = "company"),
-                        @Result(column = "position", property = "position"),
-                        @Result(column = "start", property = "start"),
-                        @Result(column = "departure", property = "departure")
-                }))
+                select = "queryWorkById", column = "id"))
 @ResultMap(id = "ResultWork", result = {
         @Result(column = "work_id", property = "workId"),
         @Result(column = "user_id", property = "userId")})

@@ -23,14 +23,7 @@
         <result column="nick_name" property="nickName"/>
         <result column="real_name" property="realName"/>
         <collection property="workInfos" ofType="WorkInfo"
-                    select="queryWorkById" column="id">
-            <result column="work_id" property="workId"/>
-            <result column="user_id" property="userId"/>
-            <result column="company" property="company"/>
-            <result column="position" property="position"/>
-            <result column="start" property="start"/>
-            <result column="departure" property="departure"/>
-        </collection>
+                    select="queryWorkById" column="id"/>
     </resultMap>
 
     <resultMap id="ResultWork">

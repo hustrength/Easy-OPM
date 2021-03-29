@@ -1,0 +1,52 @@
+<mapper namespace="com.rsh.easy_opm.PersonMapper">
+    <typeAliases>
+        <typeAlias type="com.rsh.easy_opm.Person@Node" alias="Person"/>
+        <typeAlias type="com.rsh.easy_opm.Location@Node" alias="Location"/>
+        <typeAlias type="com.rsh.easy_opm.BornInfo@Relationship" alias="BornInfo"/>
+        <typeAlias type="com.rsh.easy_opm.Friendship@Relationship" alias="Friendship"/>
+    </typeAliases>
+
+    <resultMap id="PersonMapper">
+        <id column="id" property="id"/>
+        <association property="spouse" ofType="Person"
+                     select="querySpouseByName" column="name"/>
+        <association property="bornInfo" ofType="BornInfo"
+                     select="queryBornInfoByName" column="name"/>
+        <collection property="friends" ofType="Friendship"
+                    select="queryFriendshipByName" column="name"/>
+    </resultMap>
+
+    <resultMap id="BornInfoMapper">
+        <result column="y.year" property="bornYear"/>
+        <association property="place" ofType="Location"
+                     select="queryBornLocationByName" column="x.name"/>
+    </resultMap>
+
+    <resultMap id="FriendshipInfo">
+        <result column="x.since" property="beginningYear"/>
+        <association property="friend" ofType="Person">
+            <result column="name" property="name"/>
+            <result column="age" property="age"/>
+        </association>
+    </resultMap>
+
+    <select id="queryPersonByName" parameterType="basic" resultType="Person" resultMap="PersonMapper">
+        match (x:Person {name:#{name}, age:#{age}} return x;
+    </select>
+
+    <select id="querySpouseByName" parameterType="basic" resultType="Person">
+        match (:Person {name:#{name}})-[:MARRIED]-(x) return x;
+    </select>
+
+    <select id="queryBornInfoByName" parameterType="basic" resultType="BornInfo" resultMap="BornInfoMapper">
+        match (x:Person {name:#{name})-[y:BORN_IN]->() return x.name, y.year;
+    </select>
+
+    <select id="queryBornLocationByName" parameterType="basic" resultType="Location">
+        match (:Person {name:#{name})-[:BORN_IN]->(x) return x;
+    </select>
+
+    <select id="queryFriendshipByName" parameterType="basic" resultType="Friendship" resultMap="FriendshipInfo">
+        match (:Person {name:#{name})-[x:FRIENDS]-(y) return x.since, y;
+    </select>
+</mapper>

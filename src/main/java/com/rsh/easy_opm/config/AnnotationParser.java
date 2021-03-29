@@ -4,6 +4,7 @@ import com.rsh.easy_opm.annotation.*;
 import com.rsh.easy_opm.error.AssertError;
 
 import java.lang.reflect.Method;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,7 @@ public class AnnotationParser {
         }
 
         // parse association node
-        if (resultMap.association().length != 0){
+        if (resultMap.association().length != 0) {
             parseAssociation(nameMapper, resultMap, union);
         }
 
@@ -82,7 +83,7 @@ public class AnnotationParser {
         unions.put(id, union);
     }
 
-    private void parseCollection(Map<String, String> nameMapper, ResultMap resultMap, ResultMapUnion union){
+    private void parseCollection(Map<String, String> nameMapper, ResultMap resultMap, ResultMapUnion union) {
         // only the 1st Collection node will be parsed
         if (resultMap.collection().length > 1)
             AssertError.warning("Only the 1st Collection node will be parsed");
@@ -107,7 +108,7 @@ public class AnnotationParser {
         }
     }
 
-    private void parseAssociation(Map<String, String> nameMapper, ResultMap resultMap, ResultMapUnion union){
+    private void parseAssociation(Map<String, String> nameMapper, ResultMap resultMap, ResultMapUnion union) {
         Association[] associations = resultMap.association();
         for (Association association :
                 associations) {
@@ -139,7 +140,9 @@ public class AnnotationParser {
         if (method.isAnnotationPresent(ParamType.class)) {
             ParamType type = method.getAnnotation(ParamType.class);
             Class<?> typeValue = type.value();
-            if (Number.class.isAssignableFrom(typeValue) || String.class.isAssignableFrom(typeValue)) {
+            if (Number.class.isAssignableFrom(typeValue) || String.class.isAssignableFrom(typeValue)
+                    || Date.class.isAssignableFrom(typeValue) || Boolean.class.isAssignableFrom(typeValue)
+                    || Character.class.isAssignableFrom(typeValue)) {
                 paramType = "basic";
             } else if (typeValue.isAssignableFrom(Map.class)) {
                 paramType = "map";
@@ -205,7 +208,7 @@ public class AnnotationParser {
         // parse Replaced Params ${...} in SQL
         List<String> replacedParamOrder = MapperBuilder.parseReplacedParams(sql);
 
-        ms.setSql(parsedSql);
+        ms.setQueryStr(parsedSql);
         ms.setPreparedParamOrder(preparedParamOrder);
         ms.setReplacedParamOrder(replacedParamOrder);
         ms.setParaType(paramType);

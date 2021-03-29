@@ -3,14 +3,14 @@ package com.rsh.easy_opm.sqlsession;
 import com.rsh.easy_opm.config.Configuration;
 import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.error.AssertError;
-import com.rsh.easy_opm.executor.BaseSqlExecutor;
+import com.rsh.easy_opm.executor.BaseCqlExecutor;
 import com.rsh.easy_opm.executor.Executor;
+import org.neo4j.driver.Driver;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-public class DefaultSqlSession implements SqlSession{
+public class DefaultCqlSession implements CqlSession{
     private Configuration config;
 
     private Executor executor;
@@ -18,9 +18,9 @@ public class DefaultSqlSession implements SqlSession{
     private Object proxy;
 
 
-    public DefaultSqlSession(Configuration config, Connection conn) {
+    public DefaultCqlSession(Configuration config, Driver driver) {
         this.config = config;
-        this.executor = new BaseSqlExecutor(conn, this);
+        this.executor = new BaseCqlExecutor(driver, this);
     }
 
     @Override
@@ -53,34 +53,7 @@ public class DefaultSqlSession implements SqlSession{
     }
 
     @Override
-    public Class<?> getMapperInterface() {
-        return mapperInterface;
-    }
-
-    @Override
-    public Object getProxy() {
-        return proxy;
-    }
-
-    @Override
     public void setProxy(Object proxy) {
         this.proxy = proxy;
     }
-
-    public Configuration getConfig() {
-        return config;
-    }
-
-    public void setConfig(Configuration config) {
-        this.config = config;
-    }
-
-    public Executor getExecutor() {
-        return executor;
-    }
-
-    public void setExecutor(Executor executor) {
-        this.executor = executor;
-    }
-
 }

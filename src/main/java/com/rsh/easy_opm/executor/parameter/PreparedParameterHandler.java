@@ -3,46 +3,37 @@ package com.rsh.easy_opm.executor.parameter;
 import com.rsh.easy_opm.error.AssertError;
 
 import java.lang.reflect.Field;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
 public class PreparedParameterHandler implements ParameterHandler {
 
-    private final PreparedStatement preparedStatement;
-
-    public PreparedParameterHandler(PreparedStatement preparedStatement) {
-        this.preparedStatement = preparedStatement;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
-    public Object setParameters(String paramType, List<String> paramOrder, Object[] parameter) throws SQLException {
+    public Object[] setParameters(String paramType, List<String> paramOrder, Object[] parameter) {
         if (parameter == null) {
             return null;
         }
+        Object[] mappedParam;
         switch (paramType) {
             case "map": {
                 CheckParameter.checkMap(parameter);
                 Map<String, Object> map = (Map<String, Object>) parameter[0];
-                Object[] mappedParam = new Object[paramOrder.size()];
+                mappedParam = new Object[paramOrder.size()];
                 for (int i = 0; i < paramOrder.size(); i++) {
                     String curPara = paramOrder.get(i);
                     AssertError.notFoundError(map.containsKey(curPara), "Set para[" + curPara + ']');
                     mappedParam[i] = map.get(curPara);
                 }
-                setMappedParam(preparedStatement, mappedParam);
                 break;
             }
             case "basic": {
                 CheckParameter.checkBasic(parameter);
-                setMappedParam(preparedStatement, parameter);
+                mappedParam = new Object[]{parameter[0]};
                 break;
             }
             default: {
-                Object[] mappedParam = new Object[paramOrder.size()];
+                mappedParam = new Object[paramOrder.size()];
                 // if given para is not matched Class, exceptions will be thrown
                 try {
                     Class<?> entityClass = Class.forName(paramType);
@@ -54,27 +45,8 @@ public class PreparedParameterHandler implements ParameterHandler {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                setMappedParam(preparedStatement, mappedParam);
             }
         }
-        return null;
-    }
-
-    private void setMappedParam(PreparedStatement preparedStatement, Object[] param) throws SQLException {
-        for (int i = 0; i < param.length; i++) {
-            if (param[i] instanceof Integer) {
-                preparedStatement.setInt(i + 1, (int) param[i]);
-            } else if (param[i] instanceof String) {
-                preparedStatement.setString(i + 1, (String) param[i]);
-            } else if (param[i] instanceof Float) {
-                preparedStatement.setFloat(i + 1, (float) param[i]);
-            } else if (param[i] instanceof Character) {
-                preparedStatement.setByte(i + 1, (byte) param[i]);
-            } else if (param[i] instanceof Boolean) {
-                preparedStatement.setBoolean(i + 1, (boolean) param[i]);
-            } else if (param[i] instanceof Date) {
-                preparedStatement.setDate(i+1, (Date) param[i]);
-            }
-        }
+        return mappedParam;
     }
 }

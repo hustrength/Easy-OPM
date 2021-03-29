@@ -12,25 +12,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public class BaseExecutor implements Executor {
+public class BaseSqlExecutor implements Executor {
     Connection conn;
     SqlSession sqlSession;
 
-    public BaseExecutor(Connection conn, SqlSession sqlSession) {
+    public BaseSqlExecutor(Connection conn, SqlSession sqlSession) {
         this.conn = conn;
         this.sqlSession = sqlSession;
     }
 
     @Override
-    public <E> List<E> query(MappedStatement ms, Object[] parameter, Class<E> mapperInterface) throws SQLException {
+    public <E> List<E> query(MappedStatement ms, Object[] parameter, Class<E> mapperInterface) throws Exception {
         System.out.println("Start to execute SQL: " + ms.getSourceId() + " >>>");
 
         // Instantiate ReplacedParameterHandler Class
-        ParameterHandler replacedParamHandler = new ReplacedParameterHandler(ms.getSql());
+        ParameterHandler replacedParamHandler = new ReplacedParameterHandler(ms.getQueryStr());
 
         // Set replaced parameters
         String replacedSql = (String) replacedParamHandler.setParameters(ms.getParaType(), ms.getReplacedParamOrder(), parameter);
-        ms.setSql(replacedSql);
+        ms.setQueryStr(replacedSql);
 
         // Instantiate StatementHandler Class
         StatementHandler statementHandler = new DefaultStatementHandler(ms);
@@ -39,16 +39,16 @@ public class BaseExecutor implements Executor {
         PreparedStatement preparedStatement = statementHandler.prepare(conn);
 
         // Instantiate PreparedParameterHandler Class
-        ParameterHandler preparedParamHandler = new PreparedParameterHandler(preparedStatement);
+        SqlPreparedParameter preparedParameter = new SqlPreparedParameter(preparedStatement);
 
         // Set prepared parameters
-        preparedParamHandler.setParameters(ms.getParaType(), ms.getPreparedParamOrder(), parameter);
+        preparedParameter.prepare(ms.getParaType(), ms.getPreparedParamOrder(), parameter);
 
         // Execute SQL and get ResultSet
         ResultSet resultSet = statementHandler.execute(preparedStatement);
 
         // Instantiate ResultSetHandler Class and convert result to POJO
-        ResultSetHandler resultSetHandler = new DefaultResultSetHandler(ms, sqlSession);
+        ResultSetHandler resultSetHandler = new SqlResultSetHandler(ms, sqlSession);
 
         // Get SQL result
         List<E> result = resultSetHandler.handleResultSet(resultSet);

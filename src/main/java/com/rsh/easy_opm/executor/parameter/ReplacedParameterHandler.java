@@ -9,14 +9,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReplacedParameterHandler implements ParameterHandler {
-    String sql;
+    String queryStr;
 
-    public ReplacedParameterHandler(String sql) {
-        this.sql = sql;
+    public ReplacedParameterHandler(String queryStr) {
+        this.queryStr = queryStr;
     }
 
-    public String getSql() {
-        return sql;
+    public String getQueryStr() {
+        return queryStr;
     }
 
     @SuppressWarnings("unchecked")
@@ -24,7 +24,7 @@ public class ReplacedParameterHandler implements ParameterHandler {
     public Object setParameters(String paramType, List<String> paramOrder, Object[] parameter) throws SQLException {
         // when paramOrder is null, there is no replaced params
         if (paramOrder == null)
-            return sql;
+            return queryStr;
         // when paramOrder is not null, the paramType must be map
         AssertError.notMatchedError(paramType.equals("map"), "Using replaced params ${...}, paramType", paramType, "specified paramType", "map");
 
@@ -33,10 +33,10 @@ public class ReplacedParameterHandler implements ParameterHandler {
         Map<String, Object> map = (Map<String, Object>) parameter[0];
         String pattern = "\\$\\{([^#{}]*)}";
         Pattern r = Pattern.compile(pattern);
-        Matcher m = r.matcher(sql);
+        Matcher m = r.matcher(queryStr);
         while (m.find()) {
-            sql = sql.replaceFirst(pattern, String.valueOf(map.get(m.group(1))));
+            queryStr = queryStr.replaceFirst(pattern, String.valueOf(map.get(m.group(1))));
         }
-        return sql;
+        return queryStr;
     }
 }

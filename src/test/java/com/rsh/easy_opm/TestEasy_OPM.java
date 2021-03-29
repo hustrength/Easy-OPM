@@ -1,8 +1,7 @@
 package com.rsh.easy_opm;
 
-import com.rsh.easy_opm.error.AssertError;
-import com.rsh.easy_opm.sqlsession.SqlSession;
-import com.rsh.easy_opm.sqlsession.SqlSessionFactory;
+import com.rsh.easy_opm.sqlsession.BasicSession;
+import com.rsh.easy_opm.sqlsession.SessionFactory;
 import com.rsh.easy_opm.json.JsonMapper;
 import org.junit.Test;
 
@@ -12,8 +11,9 @@ public class TestEasy_OPM {
 
     @Test
     public void test() {
-        SqlSessionFactory factory = new SqlSessionFactory();
-        SqlSession sqlSession = factory.getSession(SqlSessionFactory.DB_Type.RD);
+        SessionFactory factory = new SessionFactory();
+
+        BasicSession sqlSession = factory.getSession(SessionFactory.DB_TYPE.RD);
 
         User_WorkMapper user_workMapper = sqlSession.getMapper(User_WorkMapper.class);
 
@@ -35,6 +35,7 @@ public class TestEasy_OPM {
         User jsonResult = jsonMapper.readValueFromFile(new File("1.txt"), User.class);
         System.out.println("\nMy json to POJ mapper:");
         System.out.println(jsonResult);
+
     }
 }
 
