@@ -11,7 +11,7 @@ public class SessionFactory {
         RD, GD
     }
 
-    public BasicSession getSession(DB_TYPE type) {
+    public DefaultSession getSession(DB_TYPE type) {
         ConfigBuilder configBuilder = new ConfigBuilder();
         Configuration config = configBuilder.getConfig();
         switch (type) {

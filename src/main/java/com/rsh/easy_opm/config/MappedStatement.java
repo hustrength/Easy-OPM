@@ -28,7 +28,10 @@ public class MappedStatement {
 
     private String paraType;
 
-    private ResultMapUnion resultMapUnion;
+    private List<ResultMapUnion> resultMapUnionList;
+
+    // The ID used to unite multiple collection class
+    private String collectionId;
 
     public String getNamespace() {
         return namespace;
@@ -102,28 +105,20 @@ public class MappedStatement {
         this.paraType = paraType;
     }
 
-    public ResultMapUnion getResultMapUnion() {
-        return resultMapUnion;
+    public List<ResultMapUnion> getResultMapUnionList() {
+        return resultMapUnionList;
     }
 
-    public void setResultMapUnion(ResultMapUnion resultMapUnion) {
-        this.resultMapUnion = resultMapUnion;
+    public void setResultMapUnionList(List<ResultMapUnion> resultMapUnionList) {
+        this.resultMapUnionList = resultMapUnionList;
     }
 
-    @Override
-    public String toString() {
-        return "MappedStatement{" +
-                "namespace='" + namespace + '\'' +
-                ", sourceId='" + sourceId + '\'' +
-                ", sql='" + queryStr + '\'' +
-                ", resultType='" + resultType + '\'' +
-                ", commandType='" + commandType + '\'' +
-                ", preparedParamOrder=" + preparedParamOrder +
-                ", replacedParamOrder=" + replacedParamOrder +
-                ", paraType='" + paraType + '\'' +
-                ", resultMapUnion={" + resultMapUnion + '}' +
-                "\n\t, resultMap={" + printResultMap() + '}' +
-                '}';
+    public String getCollectionId() {
+        return collectionId;
+    }
+
+    public void setCollectionId(String collectionId) {
+        this.collectionId = collectionId;
     }
 
     public String printResultMap() {

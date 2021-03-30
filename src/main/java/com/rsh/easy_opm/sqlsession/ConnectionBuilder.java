@@ -22,14 +22,24 @@ public class ConnectionBuilder {
             Class.forName(config.getDbDriver());
             conn = DriverManager.getConnection(config.getDbUrl(), config.getDbUserName(), config.getDbPassword());
             conn.setAutoCommit(true);
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Fail to connect relational database");
+            System.out.println(config);
+            System.out.println();
         }
         return conn;
     }
 
     public Driver getGDConnection() {
-        return GraphDatabase.driver(config.getDbDriver(),
-                AuthTokens.basic(config.getDbUserName(), config.getDbPassword()));
+        Driver driver = null;
+        try {
+            driver = GraphDatabase.driver(config.getDbUrl(),
+                    AuthTokens.basic(config.getDbUserName(), config.getDbPassword()));
+        }catch (Exception e){
+            System.out.println("Fail to connect graph database");
+            System.out.println(config);
+            System.out.println();
+        }
+        return driver;
     }
 }

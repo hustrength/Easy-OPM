@@ -3,7 +3,7 @@ package com.rsh.easy_opm;
 public class Friendship {
     private int id;
     private Person friend;
-    private String beginningYear;
+    private int beginningYear;
 
     public int getId() {
         return id;
@@ -21,11 +21,20 @@ public class Friendship {
         this.friend = friend;
     }
 
-    public String getBeginningYear() {
+    public int getBeginningYear() {
         return beginningYear;
     }
 
-    public void setBeginningYear(String beginningYear) {
+    public void setBeginningYear(int beginningYear) {
         this.beginningYear = beginningYear;
+    }
+
+    @Override
+    public String toString() {
+        return "Friendship{" +
+                "id=" + id +
+                ", friend=" + friend +
+                ", beginningYear=" + beginningYear +
+                '}';
     }
 }

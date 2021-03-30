@@ -9,6 +9,4 @@ public interface BasicSession {
     <T> T selectOne(String sourceID, Object[] parameter);
 
     <E> List<E> selectList(String sourceID, Object[] parameter);
-
-    void setProxy(Object proxy);
 }

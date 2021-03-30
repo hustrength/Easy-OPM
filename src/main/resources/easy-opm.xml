@@ -3,7 +3,7 @@
     <properties resource="db.properties"/>
 
     <!-- set a default connection -->
-    <environments default="mysql_developer">
+    <environments default="neo4j_developer">
         <!-- an optional connection configuration -->
         <environment id="mysql_developer">
             <dataSource>
@@ -12,6 +12,15 @@
                 <property name="url" value="${mysql.url}"/>
                 <property name="username" value="${mysql.username}"/>
                 <property name="password" value="${mysql.password}"/>
+            </dataSource>
+        </environment>
+
+        <environment id="neo4j_developer">
+            <dataSource>
+                <!-- three indispensable properties to connect database -->
+                <property name="url" value="${neo4j.url}"/>
+                <property name="username" value="${neo4j.username}"/>
+                <property name="password" value="${neo4j.password}"/>
             </dataSource>
         </environment>
     </environments>

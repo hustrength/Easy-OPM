@@ -4,19 +4,18 @@ import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.executor.parameter.*;
 import com.rsh.easy_opm.executor.resultset.*;
 import com.rsh.easy_opm.executor.statement.*;
-import com.rsh.easy_opm.sqlsession.SqlSession;
+import com.rsh.easy_opm.sqlsession.DefaultSqlSession;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 public class BaseSqlExecutor implements Executor {
     Connection conn;
-    SqlSession sqlSession;
+    DefaultSqlSession sqlSession;
 
-    public BaseSqlExecutor(Connection conn, SqlSession sqlSession) {
+    public BaseSqlExecutor(Connection conn, DefaultSqlSession sqlSession) {
         this.conn = conn;
         this.sqlSession = sqlSession;
     }
@@ -30,6 +29,9 @@ public class BaseSqlExecutor implements Executor {
 
         // Set replaced parameters
         String replacedSql = (String) replacedParamHandler.setParameters(ms.getParaType(), ms.getReplacedParamOrder(), parameter);
+
+        // replace all "#{...}" with "?" in SQL
+        replacedSql = replacedSql.replaceAll("#\\{([^#{}]*)}", "?");
         ms.setQueryStr(replacedSql);
 
         // Instantiate StatementHandler Class
@@ -44,7 +46,7 @@ public class BaseSqlExecutor implements Executor {
         // Set prepared parameters
         preparedParameter.prepare(ms.getParaType(), ms.getPreparedParamOrder(), parameter);
 
-        // Execute SQL and get ResultSet
+        // Executor SQL and get ResultSet
         ResultSet resultSet = statementHandler.execute(preparedStatement);
 
         // Instantiate ResultSetHandler Class and convert result to POJO

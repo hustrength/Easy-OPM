@@ -1,5 +1,7 @@
 package com.rsh.easy_opm;
 
+import java.util.List;
+
 public interface PersonMapper {
     Person queryPersonByName(String name);
 
@@ -9,5 +11,5 @@ public interface PersonMapper {
 
     Location queryBornLocationByName(String name);
 
-    Friendship queryFriendshipByName(String name);
+    List<Friendship> queryFriendshipByName(String name);
 }

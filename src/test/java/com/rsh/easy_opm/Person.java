@@ -57,4 +57,13 @@ public class Person {
     public void setBornInfo(BornInfo bornInfo) {
         this.bornInfo = bornInfo;
     }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
 }

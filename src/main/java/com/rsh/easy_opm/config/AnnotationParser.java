@@ -5,6 +5,7 @@ import com.rsh.easy_opm.error.AssertError;
 
 import java.lang.reflect.Method;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,16 +13,20 @@ import java.util.Map;
 public class AnnotationParser {
     private final Map<String, Map<String, String>> resultMaps = new HashMap<>();
     private final Class<?> mapperInterface;
-    private final Map<String, ResultMapUnion> unions = new HashMap<>();
+    private final Map<String, List<ResultMapUnion>> unionsMap = new HashMap<>();
+    private final Map<String, String> collectionIds = new HashMap<>();
 
+    public String getCollectionId(String sourceId){
+        return collectionIds.getOrDefault(sourceId, null);
+    }
 
     private Map<String, String> getResultMap(String sourceId) {
         AssertError.notFoundError(resultMaps.containsKey(sourceId), "resultMap ID[" + sourceId + "] from @ResultMap", "known resultMaps in " + mapperInterface.getName());
         return resultMaps.get(sourceId);
     }
 
-    public ResultMapUnion getUnion(String sourceId) {
-        return unions.getOrDefault(sourceId, null);
+    public List<ResultMapUnion> getUnionList(String sourceId) {
+        return unionsMap.getOrDefault(sourceId, null);
     }
 
     public AnnotationParser(Class<?> mapperInterface) {
@@ -57,7 +62,7 @@ public class AnnotationParser {
             nameMapper.put(result.property(), result.column());
         }
 
-        ResultMapUnion union = new ResultMapUnion();
+        List<ResultMapUnion> unions = new ArrayList<>();
 
         if (resultMap.collection().length != 0) {
             // only when collection node exists, parse Id node
@@ -68,19 +73,26 @@ public class AnnotationParser {
             if (resultMap.idNode().length > 1)
                 AssertError.warning("Only the 1st Id node will be parsed");
             nameMapper.put(resultsIdNode.property(), resultsIdNode.column());
-            union.setCollectionId(resultsIdNode.property());
+
+            // only when collection node exists, assign the collectionId
+            collectionIds.put(id, resultsIdNode.property());
 
             // parse collection node
+            ResultMapUnion union = new ResultMapUnion();
+            unions.add(union);
             parseCollection(nameMapper, resultMap, union);
         }
 
         // parse association node
         if (resultMap.association().length != 0) {
+            ResultMapUnion union = new ResultMapUnion();
+            unions.add(union);
             parseAssociation(nameMapper, resultMap, union);
         }
 
         resultMaps.put(id, nameMapper);
-        unions.put(id, union);
+        if (!unions.isEmpty())
+            unionsMap.put(id, unions);
     }
 
     private void parseCollection(Map<String, String> nameMapper, ResultMap resultMap, ResultMapUnion union) {
@@ -187,7 +199,8 @@ public class AnnotationParser {
             ResultMapId resultMap = method.getAnnotation(ResultMapId.class);
             String resultsID = resultMap.value();
             ms.setResultMap(getResultMap(resultsID));
-            ms.setResultMapUnion(getUnion(resultsID));
+            ms.setResultMapUnionList(getUnionList(resultsID));
+            ms.setCollectionId(getCollectionId(resultsID));
             foundAnnotation = true;
         }
 

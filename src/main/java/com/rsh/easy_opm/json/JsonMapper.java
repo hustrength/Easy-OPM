@@ -2,10 +2,7 @@ package com.rsh.easy_opm.json;
 
 import com.rsh.easy_opm.error.AssertError;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -61,7 +58,7 @@ public class JsonMapper {
         }
 
         byte[] fileContent = new byte[(int) fileLength];
-        try (FileInputStream in = new FileInputStream(file)){
+        try (FileInputStream in = new FileInputStream(file)) {
             if (in.read(fileContent) == -1) {
                 AssertError.warning("Fail to read value from a file, because the file[" + file.toString() + "] is empty");
                 return null;
@@ -77,12 +74,16 @@ public class JsonMapper {
     }
 
     public void writeValueAsFile(File file, Object obj) {
-        if (!OVERIDE_ON && file.exists()) {
-            AssertError.warning("Fail to write value as a file, because the file[" + file.toString() + "] already exists");
-            return;
+        try {
+            if (!OVERIDE_ON && !file.createNewFile()) {
+                AssertError.warning("Fail to write value as a file, because the file[" + file.toString() + "] already exists");
+                return;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        try (PrintWriter output = new PrintWriter(file)){
+        try (PrintWriter output = new PrintWriter(file)) {
             output.println(writeValueAsString(obj));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -107,7 +108,7 @@ public class JsonMapper {
     private <T> T readValue(String json, Class<T> entityClass) throws Exception {
         if (json.equals("null"))
             return null;
-        T entity = (T) entityClass.newInstance();
+        T entity = (T) entityClass.getConstructor().newInstance();
         Field[] fields = entityClass.getDeclaredFields();
 
         // regex for matching the whole entity
@@ -138,7 +139,7 @@ public class JsonMapper {
                 // extract actual value from Collection
                 if (collectionVal != null)
                     fieldValue = collectionVal;
-                // extract actual value from String
+                    // extract actual value from String
                 else if (stringVal != null)
                     fieldValue = stringVal;
 

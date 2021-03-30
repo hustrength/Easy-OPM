@@ -62,13 +62,12 @@ public class MapperBuilder {
                 // get resultMap and union settings
                 if (resultMap != null) {
                     mappedStatement.setResultMap(resultMapBuilder.getResultMap(resultMap));
-                    mappedStatement.setResultMapUnion(resultMapBuilder.getUnion(resultMap));
+                    mappedStatement.setResultMapUnionList(resultMapBuilder.getUnionList(resultMap));
+                    mappedStatement.setCollectionId(resultMapBuilder.getCollectionId(resultMap));
                 }
 
                 // parse Prepared Params #{...} in SQL
                 List<String> preparedParamOrder = parsePreparedParams(sql);
-                // replace all "#{...}" with "?" in SQL
-                sql = sql.replaceAll("#\\{([^#{}]*)}", "?");
 
                 // parse Replaced Params ${...} in SQL
                 List<String> replacedParamOrder = parseReplacedParams(sql);

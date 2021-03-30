@@ -30,8 +30,8 @@ public class ConfigBuilder {
         parseEnvironments(root.element("environments"));
         parseMappers(root.element("mappers"));
 
-        // check if indispensable DB configurations are set
-        config.checkDbConfig();
+//        // check if indispensable DB configurations are set
+//        config.checkDbConfig();
     }
 
     private Element loadXML() {

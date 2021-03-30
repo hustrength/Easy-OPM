@@ -1,61 +1,60 @@
 package com.rsh.easy_opm.reflection;
 
+import com.rsh.easy_opm.error.AssertError;
 import org.neo4j.driver.Record;
-import org.neo4j.driver.Result;
-import org.neo4j.driver.types.Relationship;
-import org.neo4j.driver.types.Node;
+import org.neo4j.driver.types.Entity;
 
 import java.lang.reflect.Field;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GdReflectionUtil implements ReflectionUtil {
-    private final String resultType;
-    private final Map<String, String> resultMap;
-    private final Result resultSet;
-    private Record record = null;
+public class GdReflectionUtil extends ReflectionUtil {
 
-    public GdReflectionUtil(String resultType, Map<String, String> resultMap, Result resultSet) {
+    public GdReflectionUtil(String resultType, String unionOfType, Map<String, String> resultMap) {
         this.resultType = resultType;
         this.resultMap = resultMap;
-        this.resultSet = resultSet;
-    }
-    @SuppressWarnings("unchecked")
-    public Object convertToBean() {
-        record = resultSet.next();
-        try {
-            Object basicType = convertToBasicBean(resultType);
-            if (basicType != null)
-                return basicType;
-
-            return convertToEntityBean();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        this.unionOfType = unionOfType;
     }
 
     @SuppressWarnings("unchecked")
-    private <T> Object convertToEntityBean()throws Exception{
+    <T> Object convertToEntityBean(Object result) throws Exception {
+        if (iterateNumExceed(resultType))
+            return null;
+
         boolean entityNotNull = false;
-        Class<T> entityClass = (Class<T>) Class.forName(resultType);
-        T entity = (T) entityClass.newInstance();
-        Field[] declaredFields = entityClass.getDeclaredFields();
+
+        Class<T> javaClass = (Class<T>) Class.forName(resultType);
+        T javaEntity = javaClass.getConstructor().newInstance();
+
+        // get the graph database entity, such as Node, Relationship, etc.
+        String thisColumn = mapResult("this");
+        Entity gdEntity = null;
+        if (!thisColumn.equals("this"))
+            gdEntity = ((Record) result).get(thisColumn).asEntity();
+
+        Field[] declaredFields = javaClass.getDeclaredFields();
         for (Field field : declaredFields) {
             String fieldName = field.getName();
             String mappedName = mapResult(fieldName);
-            if (setField(field, mappedName, entity))
-                entityNotNull = true;
+
+            if (mappedName.charAt(0) == '@') {
+                AssertError.notFoundError(gdEntity != null, "The mapping of the entity itself", "resultMap");
+                if (setField(field, mappedName.substring(1), javaEntity, gdEntity))
+                    entityNotNull = true;
+            } else {
+                if (setField(field, mappedName, javaEntity, result))
+                    entityNotNull = true;
+            }
         }
-        return entityNotNull ? entity : null;
+        return entityNotNull ? javaEntity : null;
     }
 
-    private Object convertToBasicBean(String type) throws SQLException {
-        switch (type){
+    Object convertToBasicBean(String type, Object result) {
+        Record record = (Record) result;
+        switch (type) {
             case "String":
             case "Date":
                 return record.get(0).asString();
@@ -87,17 +86,22 @@ public class GdReflectionUtil implements ReflectionUtil {
         }
     }
 
-    private String mapResult(String fieldName) {
-        if (resultMap == null)
-            return fieldName;
-        return resultMap.getOrDefault(fieldName, fieldName);
+    boolean existColumn(String columnName, Object result) {
+        if (result instanceof Record) {
+            Record record = (Record) result;
+            return record.containsKey(columnName);
+        } else if (result instanceof Entity) {
+            Entity entity = (Entity) result;
+            return entity.containsKey(columnName);
+        } else return false;
     }
 
-    private boolean existColumn(String columnName) {
-        return record.containsKey(columnName);
-    }
+    <T> boolean setField(Field field, String mappedName, T entity, Object result) throws Exception {
+        boolean isRecord = false;
+        if (result instanceof Record) {
+            isRecord = true;
+        }
 
-    private <T> boolean setField(Field field, String mappedName, T entity) throws Exception {
         field.setAccessible(true);
 
         // do not set the field if not existing in resultSet
@@ -106,60 +110,98 @@ public class GdReflectionUtil implements ReflectionUtil {
         switch (fieldType) {
             case "Date":
             case "String":
-                if (existColumn(mappedName)) {
+                if (existColumn(mappedName, result)) {
                     haveSet = true;
-                    field.set(entity, record.get(mappedName).asString());
+                    if (isRecord)
+                        field.set(entity, ((Record) result).get(mappedName).asString());
+                    else
+                        field.set(entity, ((Entity) result).get(mappedName).asString());
                 }
                 break;
             case "Integer":
             case "int":
-                if (existColumn(mappedName)) {
+                // for symbol "$id", set the identity of entity
+                if (mappedName.equals("$id")){
                     haveSet = true;
-                    field.set(entity, record.get(mappedName).asInt());
+                    field.set(entity, (int)((Entity) result).id());
+                    break;
+                }
+
+                if (existColumn(mappedName, result)) {
+                    haveSet = true;
+                    if (isRecord)
+                        field.set(entity, ((Record) result).get(mappedName).asInt());
+                    else
+                        field.set(entity, ((Entity) result).get(mappedName).asInt());
                 }
                 break;
             case "Boolean":
             case "boolean":
-                if (existColumn(mappedName)) {
+                if (existColumn(mappedName, result)) {
                     haveSet = true;
-                    field.set(entity, record.get(mappedName).asBoolean());
+                    if (isRecord)
+                        field.set(entity, ((Record) result).get(mappedName).asBoolean());
+                    else
+                        field.set(entity, ((Entity) result).get(mappedName).asBoolean());
                 }
                 break;
             case "Float":
             case "float":
-                if (existColumn(mappedName)) {
+                if (existColumn(mappedName, result)) {
                     haveSet = true;
-                    field.set(entity, record.get(mappedName).asFloat());
+                    if (isRecord)
+                        field.set(entity, ((Record) result).get(mappedName).asFloat());
+                    else
+                        field.set(entity, ((Entity) result).get(mappedName).asFloat());
                 }
                 break;
             case "Character":
             case "char":
-                if (existColumn(mappedName)) {
+                if (existColumn(mappedName, result)) {
                     haveSet = true;
-                    field.set(entity, record.get(mappedName).asString().charAt(0));
+                    if (isRecord)
+                        field.set(entity, ((Record) result).get(mappedName).asString().charAt(0));
+                    else
+                        field.set(entity, ((Entity) result).get(mappedName).asString().charAt(0));
                 }
                 break;
             case "Byte":
             case "byte":
             case "Short":
             case "short":
-                if (existColumn(mappedName)) {
+                if (existColumn(mappedName, result)) {
                     haveSet = true;
-                    field.set(entity, record.get(mappedName).asNumber());
+                    if (isRecord)
+                        field.set(entity, ((Record) result).get(mappedName).asNumber());
+                    else
+                        field.set(entity, ((Entity) result).get(mappedName).asNumber());
                 }
                 break;
             case "Long":
             case "long":
-                if (existColumn(mappedName)) {
+                // for symbol "$id", set the identity of entity
+                if (mappedName.equals("$id")){
                     haveSet = true;
-                    field.set(entity, record.get(mappedName).asLong());
+                    field.set(entity, ((Entity) result).id());
+                    break;
+                }
+
+                if (existColumn(mappedName, result)) {
+                    haveSet = true;
+                    if (isRecord)
+                        field.set(entity, ((Record) result).get(mappedName).asLong());
+                    else
+                        field.set(entity, ((Entity) result).get(mappedName).asLong());
                 }
                 break;
             case "Double":
             case "double":
-                if (existColumn(mappedName)) {
+                if (existColumn(mappedName, result)) {
                     haveSet = true;
-                    field.set(entity, record.get(mappedName).asDouble());
+                    if (isRecord)
+                        field.set(entity, ((Record) result).get(mappedName).asDouble());
+                    else
+                        field.set(entity, ((Entity) result).get(mappedName).asDouble());
                 }
                 break;
             default:
@@ -173,7 +215,7 @@ public class GdReflectionUtil implements ReflectionUtil {
                     String elementType;
                     if (m.find()) {
                         elementType = m.group(1);
-                        Object entityValue = setEntity(elementType);
+                        Object entityValue = setEntity(elementType, result);
                         List<Object> entityList = new ArrayList<>();
                         if (entityValue != null) {
                             haveSet = true;
@@ -182,7 +224,7 @@ public class GdReflectionUtil implements ReflectionUtil {
                         }
                     }
                 } else {
-                    T entityValue = setEntity(field.getType().getName());
+                    T entityValue = setEntity(field.getType().getName(), result);
                     if (entityValue != null) {
                         haveSet = true;
                         field.set(entity, entityValue);
@@ -193,17 +235,34 @@ public class GdReflectionUtil implements ReflectionUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T setEntity(String classType) {
+    <T> T setEntity(String classType, Object result) {
         boolean entityNotNull = false;
         try {
+            if (iterateNumExceed(classType))
+                return null;
+
             Class<T> entityClass = (Class<T>) Class.forName(classType);
-            T entity = (T) entityClass.newInstance();
+            T entity = entityClass.getConstructor().newInstance();
+
+            // get the graph database entity, such as Node, Relationship, etc.
+            String thisColumn = "this@" + classType;
+            String mappedThisColumn = mapResult(thisColumn);
+            // when fieldName is the same as mappedName, this property mapping is not set
+            if (thisColumn.equals(mappedThisColumn))
+                return null;
+
+            Entity gdEntity = ((Record) result).get(mappedThisColumn).asEntity();
+
             Field[] declaredFields = entityClass.getDeclaredFields();
             for (Field field : declaredFields) {
                 String fieldName = field.getName() + '@' + classType;
                 String mappedName = mapResult(fieldName);
-                if (setField(field, mappedName, entity))
-                    entityNotNull = true;
+
+                // when fieldName is the same as mappedName, this property mapping is not set
+                if (!fieldName.equals(mappedName)) {
+                    if (setField(field, mappedName, entity, gdEntity))
+                        entityNotNull = true;
+                }
             }
             return entityNotNull ? entity : null;
         } catch (Exception e) {

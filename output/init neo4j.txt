@@ -1,0 +1,30 @@
+MATCH (n) DETACH DELETE n;
+
+CREATE (:Person {name:'John', age:24});
+CREATE (:Person {name:'Sally', age:18});
+CREATE (:Person {name:'Steve', age:22});
+CREATE (:Person {name:'Mike', age:21});
+CREATE (:Person {name:'Liz', age:20});
+CREATE (:Person {name:'Shawn', age:22});
+
+CREATE (:Location {city:'Miami', state:'FL'});
+CREATE (:Location {city:'Boston', state:'MA'});
+CREATE (:Location {city:'Lynn', state:'MA'});
+CREATE (:Location {city:'Portland', state:'ME'});
+CREATE (:Location {city:'San Francisco', state:'CA'});
+
+MATCH (a:Person {name:'Liz'}), (b:Person {name:'Mike'}) MERGE (a)-[:FRIENDS {since:2018}]->(b) MERGE (b)-[:FRIENDS {since:1993}]->(a);
+MATCH (a:Person {name:'Shawn'}), (b:Person {name:'Sally'}) MERGE (a)-[:FRIENDS {since:2009}]->(b) MERGE (b)-[:FRIENDS {since:2001}]->(a);
+MATCH (a:Person {name:'Shawn'}), (b:Person {name:'John'}) MERGE (a)-[:FRIENDS {since:2012}]->(b) MERGE (b)-[:FRIENDS {since:2012}]->(a);
+MATCH (a:Person {name:'Mike'}), (b:Person {name:'Shawn'}) MERGE (a)-[:FRIENDS {since:2006}]->(b) MERGE (b)-[:FRIENDS {since:2006}]->(a);
+MATCH (a:Person {name:'Sally'}), (b:Person {name:'Steve'}) MERGE (a)-[:FRIENDS {since:2019}]->(b) MERGE (b)-[:FRIENDS {since:2006}]->(a);
+MATCH (a:Person {name:'John'}), (b:Person {name:'Steve'}) MERGE (a)-[:FRIENDS {since:2015}]->(b) MERGE (b)-[:FRIENDS {since:2015}]->(a);
+
+MATCH (a:Person {name:'Liz'}), (b:Person {name:'John'}) MERGE (a)-[:MARRIED {since:2021}]->(b) MERGE (b)-[:MARRIED {since:2021}]->(a);
+
+MATCH (a:Person {name:'John'}), (b:Location {city:'Boston'}) MERGE (a)-[:BORN_IN {year:1996}]->(b);
+MATCH (a:Person {name:'Liz'}), (b:Location {city:'Boston'}) MERGE (a)-[:BORN_IN {year:2001}]->(b);
+MATCH (a:Person {name:'Mike'}), (b:Location {city:'San Francisco'}) MERGE (a)-[:BORN_IN {year:2000}]->(b);
+MATCH (a:Person {name:'Shawn'}), (b:Location {city:'Miami'}) MERGE (a)-[:BORN_IN {year:1998}]->(b);
+MATCH (a:Person {name:'Steve'}), (b:Location {city:'Lynn'}) MERGE (a)-[:BORN_IN {year:1998}]->(b);
+MATCH (a:Person {name:'Sally'}), (b:Location {city:'Portland'}) MERGE (a)-[:BORN_IN {year:2003}]->(b);

@@ -5,8 +5,7 @@ import com.rsh.easy_opm.config.AnnotationParser;
 import com.rsh.easy_opm.config.Configuration;
 import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.error.AssertError;
-import com.rsh.easy_opm.sqlsession.DefaultSqlSession;
-import com.rsh.easy_opm.sqlsession.BasicSession;
+import com.rsh.easy_opm.sqlsession.DefaultSession;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -15,15 +14,15 @@ import java.util.Collection;
 
 public class MapperProxy<T> implements InvocationHandler {
 
-    private final BasicSession session;
+    private final DefaultSession session;
     private final Class<T> mapperInterface;
     private final Configuration config;
     private final AnnotationParser annotationParser;
 
-    MapperProxy(BasicSession session, Class<T> mapperInterface) {
+    MapperProxy(DefaultSession session, Class<T> mapperInterface) {
         this.session = session;
         this.mapperInterface = mapperInterface;
-        this.config = ((DefaultSqlSession) session).getConfig();
+        this.config = session.getConfig();
         this.annotationParser = new AnnotationParser(mapperInterface);
     }
 
@@ -68,14 +67,16 @@ public class MapperProxy<T> implements InvocationHandler {
 
     private boolean existAnnotationSetting(String sourceID, Method method) {
         MappedStatement ms = config.queryMappedStatement(sourceID);
+        Class<?> entityType = method.getDeclaringClass();
+
         if (ms == null) {
             // when XML Setting is not used, check if defining @Mapper
-            Class<?> entityType = method.getDeclaringClass();
             AssertError.notFoundError(entityType.isAnnotationPresent(Mapper.class), "Annotation @Mapper");
 
             return true;
         } else {
-            AssertError.warning("For Method[" + method.toString() + "],\n\t\t" + "XML and Annotation Mapper are both set. Use XML Mapper in priority");
+            if (entityType.isAnnotationPresent(Mapper.class))
+                AssertError.warning("For Method[" + method.toString() + "],\n\t\t" + "XML and Annotation Mapper are both set. Use XML Mapper in priority");
             return false;
         }
     }

@@ -5,11 +5,6 @@ package com.rsh.easy_opm.config;
  */
 public class ResultMapUnion {
     /**
-     * The ID used to unite multiple collection class
-     */
-    private String collectionId;
-
-    /**
      * The property used to designate the to-be-united field name of collection class.
      * <br/>
      * Shared with collection node and association node.
@@ -37,14 +32,6 @@ public class ResultMapUnion {
      * Shared with collection node and association node.
      */
     private String unionOfType;
-
-    public String getCollectionId() {
-        return collectionId;
-    }
-
-    public void setCollectionId(String collectionId) {
-        this.collectionId = collectionId;
-    }
 
     public String getUnionProperty() {
         return unionProperty;
