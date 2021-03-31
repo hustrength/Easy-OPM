@@ -48,7 +48,7 @@ public class TestEasy_OPM {
     private <T> T jsonMappingTest(T result, String path){
         JsonMapper jsonMapper = new JsonMapper();
         JsonMapper.setIndentOn(true);
-//        JsonMapper.setOverideOn(true);
+//        JsonMapper.setOverwriteOn(true);
 
         System.out.println("\nMy POJ to json mapper:");
         System.out.println(jsonMapper.writeValueAsString(result));

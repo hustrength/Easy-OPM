@@ -106,44 +106,21 @@ public class JsonMapper {
     /* private methods */
 
     private <T> T readValue(String json, Class<T> entityClass) throws Exception {
-        if (json.equals("null"))
+        if (json == null || json.isEmpty())
             return null;
         T entity = entityClass.getConstructor().newInstance();
         Field[] fields = entityClass.getDeclaredFields();
 
-        // regex for matching the whole entity
-        String attribute = "\"([_a-zA-Z][_a-zA-Z0-9]*)\"";
-        String collectionValue = "\\[(.*)]";
-        String numberValue = "([^,\"}]*)";
-        String stringValue = "\"([^,\"}]*)\"";
-        String entityValue = "\\{([^,\"}]*)}";
-        String singleValue = '(' + stringValue + '|' + entityValue + '|' + numberValue + ')';
-        String value = '(' + collectionValue + '|' + singleValue + ')';
-        String regex = attribute + ':' + value;
-        Pattern p = Pattern.compile(regex);
-
-        // regex for matching the collection in the entity
-        String regexForCollection = "\\{([^}]*?)}";
-        Pattern patternForCollection = Pattern.compile(regexForCollection);
-
-        Matcher m = p.matcher(json);
+        JsonParser jsonParser = new JsonParser(json);
         for (Field field :
                 fields) {
-            if (m.find()) {
+            if (jsonParser.next()) {
                 field.setAccessible(true);
-                String fieldName = m.group(1);
-                String fieldValue = m.group(2);
-                String collectionVal = m.group(3);
-                String stringVal = m.group(5);
 
-                // extract actual value from Collection
-                if (collectionVal != null)
-                    fieldValue = collectionVal;
-                    // extract actual value from String
-                else if (stringVal != null)
-                    fieldValue = stringVal;
+                String fieldName = jsonParser.getFieldName();
+                String fieldValue = jsonParser.getFieldVal();
 
-                if (!fieldValue.equals("null")) {
+                if (fieldValue != null && !fieldValue.isEmpty()) {
                     if (!fieldName.equals(field.getName())) {
                         AssertError.warning("Field name[" + fieldName + "] in json is not matched with " + "Field name[" + field.getName() + "] in entity");
                     }
@@ -151,16 +128,17 @@ public class JsonMapper {
                     else if (!readBasicClass(fieldValue, field, entity)) {
                         // when the field type is Array
                         if (field.getType().isArray()) {
-                            Matcher matcherForArray = patternForCollection.matcher(fieldValue);
-
-                            long numOfEntity = matcherForArray.results().count();
+                            long numOfEntity = jsonParser.getCurArraySize();
                             if (numOfEntity > Integer.MAX_VALUE) {
                                 AssertError.warning("The number of entities in an array exceeds Integer.MAX_VALUE[" + Integer.MAX_VALUE + "], so only Integer.MAX_VALUE Objects are read");
                             }
+
                             Object[] objectArray = new Object[(int) numOfEntity];
+                            JsonParser arrayParser = new JsonParser(fieldValue);
+
                             for (int i = 0; i < numOfEntity; i++) {
-                                if (matcherForArray.find()) {
-                                    objectArray[i] = readValue(matcherForArray.group(1), field.getType().getComponentType());
+                                if (arrayParser.parseFieldVal()) {
+                                    objectArray[i] = readValue(arrayParser.getFieldVal(), field.getType().getComponentType());
                                 }
                             }
                             if (numOfEntity > 0)
@@ -168,7 +146,6 @@ public class JsonMapper {
                         }
                         // when the field type is List
                         else if (List.class.isAssignableFrom(field.getType())) {
-                            Matcher matcherForList = patternForCollection.matcher(fieldValue);
                             List<Object> objectList = new ArrayList<>();
 
                             String genericType = field.getGenericType().getTypeName();
@@ -180,9 +157,9 @@ public class JsonMapper {
                             if (matcherForGenericType.find()) {
                                 elementType = matcherForGenericType.group(1);
                             }
-
-                            while (matcherForList.find()) {
-                                Object result = readValue(matcherForList.group(1), Class.forName(elementType));
+                            JsonParser listParser = new JsonParser(fieldValue);
+                            while (listParser.parseFieldVal()) {
+                                Object result = readValue(listParser.getFieldVal(), Class.forName(elementType));
                                 objectList.add(result);
                             }
                             if (!objectList.isEmpty())

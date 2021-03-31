@@ -16,7 +16,7 @@ public class AnnotationParser {
     private final Map<String, List<ResultMapUnion>> unionsMap = new HashMap<>();
     private final Map<String, String> collectionIds = new HashMap<>();
 
-    public String getCollectionId(String sourceId){
+    public String getCollectionId(String sourceId) {
         return collectionIds.getOrDefault(sourceId, null);
     }
 
@@ -66,16 +66,18 @@ public class AnnotationParser {
 
 
         // parse Id node
-        AssertError.notFoundError(resultMap.idNode().length != 0, "idNode", "@resultMap in " + mapperInterface.getName());
-        Result resultsIdNode = resultMap.idNode()[0];
-
-        // only the 1st Id node will be parsed
-        if (resultMap.idNode().length > 1)
-            AssertError.warning("Only the 1st Id node will be parsed");
-        nameMapper.put(resultsIdNode.property(), resultsIdNode.column());
+        Result resultsIdNode = null;
+        if (resultMap.idNode().length != 0) {
+            resultsIdNode = resultMap.idNode()[0];
+            // only the 1st Id node will be parsed
+            if (resultMap.idNode().length > 1)
+                AssertError.warning("Only the 1st Id node will be parsed");
+            nameMapper.put(resultsIdNode.property(), resultsIdNode.column());
+        }
 
         if (resultMap.collection().length != 0) {
             // only when collection node exists, assign the collectionId
+            AssertError.notFoundError(resultsIdNode != null, "Collection Node exists, but idNode", "@resultMap in " + mapperInterface.getName());
             collectionIds.put(id, resultsIdNode.property());
 
             // parse collection node
@@ -226,7 +228,7 @@ public class AnnotationParser {
         ms.setCommandType(setEmptyStrToNull(commandType));
     }
 
-    private String setEmptyStrToNull(String str){
+    private String setEmptyStrToNull(String str) {
         if (str.isEmpty())
             return null;
         return str;

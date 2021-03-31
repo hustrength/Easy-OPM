@@ -4,7 +4,8 @@
 
     <!-- set a default connection -->
     <environments default="neo4j_developer">
-        <!-- an optional connection configuration -->
+<!--    <environments default="mysql_developer">-->
+    <!-- an optional connection configuration -->
         <environment id="mysql_developer">
             <dataSource>
                 <!-- four indispensable properties to connect database -->
@@ -30,6 +31,5 @@
 <!--        <mapper resource="mapper/UserMapper.xml"/>-->
 <!--        <mapper resource="mapper/User_WorkMapper.xml"/>-->
 <!--        <mapper resource="mapper/PersonMapper.xml"/>-->
-
     </mappers>
 </configuration>
