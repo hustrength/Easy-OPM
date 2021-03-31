@@ -142,4 +142,17 @@ public class MappedStatement {
             AssertError.notMatchedError(preparedParamOrder == null, "parameterType", "null", "given parameters", "not null", sourceId);
     }
 
+    @Override
+    public String toString() {
+        return "MappedStatement{" +
+                "namespace='" + namespace + '\'' +
+                ", sourceId='" + sourceId + '\'' +
+                ", queryStr='" + queryStr + '\'' +
+                ", resultType='" + resultType + '\'' +
+                ", commandType='" + commandType + '\'' +
+                ", paraType='" + paraType + '\'' +
+                ", resultMapUnionList=" + resultMapUnionList +
+                ", collectionId='" + collectionId + '\'' +
+                '}';
+    }
 }

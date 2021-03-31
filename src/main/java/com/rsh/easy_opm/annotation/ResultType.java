@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 public @interface ResultType {
     /**
-     * Returns the return type.
+     * Returns the return type or the return type of the element in a collection.
      */
     Class<?> value();
 }

@@ -64,16 +64,17 @@ public class AnnotationParser {
 
         List<ResultMapUnion> unions = new ArrayList<>();
 
+
+        // parse Id node
+        AssertError.notFoundError(resultMap.idNode().length != 0, "idNode", "@resultMap in " + mapperInterface.getName());
+        Result resultsIdNode = resultMap.idNode()[0];
+
+        // only the 1st Id node will be parsed
+        if (resultMap.idNode().length > 1)
+            AssertError.warning("Only the 1st Id node will be parsed");
+        nameMapper.put(resultsIdNode.property(), resultsIdNode.column());
+
         if (resultMap.collection().length != 0) {
-            // only when collection node exists, parse Id node
-            AssertError.notFoundError(resultMap.idNode().length != 0, "idNode", "@resultMap in " + mapperInterface.getName());
-            ResultsId resultsIdNode = resultMap.idNode()[0];
-
-            // only the 1st Id node will be parsed
-            if (resultMap.idNode().length > 1)
-                AssertError.warning("Only the 1st Id node will be parsed");
-            nameMapper.put(resultsIdNode.property(), resultsIdNode.column());
-
             // only when collection node exists, assign the collectionId
             collectionIds.put(id, resultsIdNode.property());
 
@@ -85,9 +86,7 @@ public class AnnotationParser {
 
         // parse association node
         if (resultMap.association().length != 0) {
-            ResultMapUnion union = new ResultMapUnion();
-            unions.add(union);
-            parseAssociation(nameMapper, resultMap, union);
+            parseAssociation(nameMapper, resultMap, unions);
         }
 
         resultMaps.put(id, nameMapper);
@@ -106,10 +105,10 @@ public class AnnotationParser {
         String collectionSelect = collection.select();
         String collectionCol = collection.column();
 
-        union.setUnionOfType(collectionType);
-        union.setUnionProperty(collectionProp);
-        union.setUnionSelect(collectionSelect);
-        union.setUnionColumn(collectionCol);
+        union.setUnionOfType(setEmptyStrToNull(collectionType));
+        union.setUnionProperty(setEmptyStrToNull(collectionProp));
+        union.setUnionSelect(setEmptyStrToNull(collectionSelect));
+        union.setUnionColumn(setEmptyStrToNull(collectionCol));
 
         Result[] collectionResults = collection.result();
         for (Result collectionResult :
@@ -120,7 +119,7 @@ public class AnnotationParser {
         }
     }
 
-    private void parseAssociation(Map<String, String> nameMapper, ResultMap resultMap, ResultMapUnion union) {
+    private void parseAssociation(Map<String, String> nameMapper, ResultMap resultMap, List<ResultMapUnion> unions) {
         Association[] associations = resultMap.association();
         for (Association association :
                 associations) {
@@ -129,10 +128,12 @@ public class AnnotationParser {
             String associationSelect = association.select();
             String associationCol = association.column();
 
-            union.setUnionProperty(associationProp);
-            union.setUnionOfType(associationType);
-            union.setUnionSelect(associationSelect);
-            union.setUnionColumn(associationCol);
+            ResultMapUnion union = new ResultMapUnion();
+            unions.add(union);
+            union.setUnionProperty(setEmptyStrToNull(associationProp));
+            union.setUnionOfType(setEmptyStrToNull(associationType));
+            union.setUnionSelect(setEmptyStrToNull(associationSelect));
+            union.setUnionColumn(setEmptyStrToNull(associationCol));
 
             Result[] associationResults = association.result();
             for (Result associationResult :
@@ -167,25 +168,25 @@ public class AnnotationParser {
             AssertError.notFoundError(method.isAnnotationPresent(ResultType.class), "resultType", "Select Node in " + mapperInterface.getName());
 
             Select select = method.getAnnotation(Select.class);
-            parseSqlCommand(ms, select.value(), paramType, "select");
+            parseQueryStr(ms, select.value(), paramType, "select");
             foundAnnotation = true;
         }
 
         if (method.isAnnotationPresent(Insert.class)) {
             Insert insert = method.getAnnotation(Insert.class);
-            parseSqlCommand(ms, insert.value(), paramType, "insert");
+            parseQueryStr(ms, insert.value(), paramType, "insert");
             foundAnnotation = true;
         }
 
         if (method.isAnnotationPresent(Delete.class)) {
             Delete delete = method.getAnnotation(Delete.class);
-            parseSqlCommand(ms, delete.value(), paramType, "delete");
+            parseQueryStr(ms, delete.value(), paramType, "delete");
             foundAnnotation = true;
         }
 
         if (method.isAnnotationPresent(Update.class)) {
             Update update = method.getAnnotation(Update.class);
-            parseSqlCommand(ms, update.value(), paramType, "update");
+            parseQueryStr(ms, update.value(), paramType, "update");
             foundAnnotation = true;
         }
 
@@ -211,20 +212,23 @@ public class AnnotationParser {
         return foundAnnotation ? ms : null;
     }
 
-    private void parseSqlCommand(MappedStatement ms, String sql, String paramType, String commandType) {
-        // replace all "#{...}" with "?" in SQL
-        String parsedSql = sql.replaceAll("#\\{([^#{}]*)}", "?");
+    private void parseQueryStr(MappedStatement ms, String queryStr, String paramType, String commandType) {
+        // parse Prepared Params #{...} in query sentence
+        List<String> preparedParamOrder = MapperBuilder.parsePreparedParams(queryStr);
 
-        // parse Prepared Params #{...} in SQL
-        List<String> preparedParamOrder = MapperBuilder.parsePreparedParams(sql);
+        // parse Replaced Params ${...} in query sentence
+        List<String> replacedParamOrder = MapperBuilder.parseReplacedParams(queryStr);
 
-        // parse Replaced Params ${...} in SQL
-        List<String> replacedParamOrder = MapperBuilder.parseReplacedParams(sql);
-
-        ms.setQueryStr(parsedSql);
+        ms.setQueryStr(setEmptyStrToNull(queryStr));
         ms.setPreparedParamOrder(preparedParamOrder);
         ms.setReplacedParamOrder(replacedParamOrder);
-        ms.setParaType(paramType);
-        ms.setCommandType(commandType);
+        ms.setParaType(setEmptyStrToNull(paramType));
+        ms.setCommandType(setEmptyStrToNull(commandType));
+    }
+
+    private String setEmptyStrToNull(String str){
+        if (str.isEmpty())
+            return null;
+        return str;
     }
 }

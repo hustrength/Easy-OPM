@@ -7,7 +7,6 @@ import org.neo4j.driver.GraphDatabase;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class ConnectionBuilder {
     Configuration config;

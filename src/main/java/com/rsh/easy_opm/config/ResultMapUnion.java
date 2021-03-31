@@ -64,4 +64,14 @@ public class ResultMapUnion {
     public void setUnionOfType(String unionOfType) {
         this.unionOfType = unionOfType;
     }
+
+    @Override
+    public String toString() {
+        return "ResultMapUnion{" +
+                "unionProperty='" + unionProperty + '\'' +
+                ", unionSelect='" + unionSelect + '\'' +
+                ", unionColumn='" + unionColumn + '\'' +
+                ", unionOfType='" + unionOfType + '\'' +
+                '}';
+    }
 }

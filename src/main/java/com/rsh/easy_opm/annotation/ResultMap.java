@@ -32,6 +32,6 @@ public @interface ResultMap {
     /**
      * The primary key of result mapping
      */
-    ResultsId[] idNode() default {};
+    Result[] idNode() default {};
 }
 

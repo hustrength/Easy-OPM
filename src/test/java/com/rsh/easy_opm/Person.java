@@ -66,4 +66,22 @@ public class Person {
                 ", age=" + age +
                 '}';
     }
+
+    public void printInfo() {
+        System.out.println("\nBasicInfo:");
+        System.out.println(this);
+
+        System.out.println("\nFriends:");
+        List<Friendship> friends = this.getFriends();
+        for (Friendship friend :
+                friends) {
+            System.out.println(friend);
+        }
+
+        System.out.println("\nSpouse:");
+        System.out.println(this.getSpouse());
+
+        System.out.println("\nBornInfo:");
+        System.out.println(this.getBornInfo());
+    }
 }

@@ -4,9 +4,8 @@ import com.rsh.easy_opm.annotation.*;
 
 import java.util.List;
 
-@Mapper
 @ResultMap(id = "workInfoMapper",
-        idNode = @ResultsId(column = "id", property = "id"),
+        idNode = @Result(column = "id", property = "id"),
         result = {
                 @Result(column = "nick_name", property = "nickName"),
                 @Result(column = "real_name", property = "realName")},
@@ -20,7 +19,7 @@ import java.util.List;
                         @Result(column = "departure", property = "departure")
                 }))
 @ResultMap(id = "TwoStepUserMapper",
-        idNode = @ResultsId(column = "id", property = "id"),
+        idNode = @Result(column = "id", property = "id"),
         result = {
                 @Result(column = "nick_name", property = "nickName"),
                 @Result(column = "real_name", property = "realName")},

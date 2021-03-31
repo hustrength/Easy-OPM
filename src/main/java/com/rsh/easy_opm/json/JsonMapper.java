@@ -15,7 +15,7 @@ public class JsonMapper {
     // when Constant INDENT is false, do not write indent
     private static boolean INDENT_ON = false;
 
-    private static boolean OVERIDE_ON = false;
+    private static boolean OVERWRITE_ON = false;
 
     public static boolean isIndentOn() {
         return INDENT_ON;
@@ -25,12 +25,12 @@ public class JsonMapper {
         JsonMapper.INDENT_ON = indentOn;
     }
 
-    public static boolean isOverideOn() {
-        return OVERIDE_ON;
+    public static boolean isOverwriteOn() {
+        return OVERWRITE_ON;
     }
 
-    public static void setOverideOn(boolean overideOn) {
-        OVERIDE_ON = overideOn;
+    public static void setOverwriteOn(boolean overwriteOn) {
+        OVERWRITE_ON = overwriteOn;
     }
 
     /* public methods */
@@ -75,7 +75,7 @@ public class JsonMapper {
 
     public void writeValueAsFile(File file, Object obj) {
         try {
-            if (!OVERIDE_ON && !file.createNewFile()) {
+            if (!OVERWRITE_ON && !file.createNewFile()) {
                 AssertError.warning("Fail to write value as a file, because the file[" + file.toString() + "] already exists");
                 return;
             }
@@ -108,7 +108,7 @@ public class JsonMapper {
     private <T> T readValue(String json, Class<T> entityClass) throws Exception {
         if (json.equals("null"))
             return null;
-        T entity = (T) entityClass.getConstructor().newInstance();
+        T entity = entityClass.getConstructor().newInstance();
         Field[] fields = entityClass.getDeclaredFields();
 
         // regex for matching the whole entity

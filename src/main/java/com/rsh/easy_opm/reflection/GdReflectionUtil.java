@@ -251,7 +251,10 @@ public class GdReflectionUtil extends ReflectionUtil {
             if (thisColumn.equals(mappedThisColumn))
                 return null;
 
-            Entity gdEntity = ((Record) result).get(mappedThisColumn).asEntity();
+            Entity gdEntity = null;
+            if (((Record) result).containsKey(mappedThisColumn)) {
+                gdEntity = ((Record) result).get(mappedThisColumn).asEntity();
+            }
 
             Field[] declaredFields = entityClass.getDeclaredFields();
             for (Field field : declaredFields) {
@@ -259,7 +262,7 @@ public class GdReflectionUtil extends ReflectionUtil {
                 String mappedName = mapResult(fieldName);
 
                 // when fieldName is the same as mappedName, this property mapping is not set
-                if (!fieldName.equals(mappedName)) {
+                if (!fieldName.equals(mappedName) && gdEntity != null) {
                     if (setField(field, mappedName, entity, gdEntity))
                         entityNotNull = true;
                 }

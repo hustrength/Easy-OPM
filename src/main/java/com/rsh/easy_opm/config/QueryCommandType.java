@@ -1,5 +1,5 @@
 package com.rsh.easy_opm.config;
 
-public enum SqlCommandType {
+public enum QueryCommandType {
     INSERT, UPDATE, DELETE, SELECT
 }

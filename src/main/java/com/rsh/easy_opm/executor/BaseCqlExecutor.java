@@ -27,7 +27,7 @@ public class BaseCqlExecutor implements Executor {
     @Override
     public <E> List<E> query(MappedStatement ms, Object[] parameter, Class<E> mapperInterface) throws Exception {
         System.out.println("Start to execute CQL: " + ms.getSourceId() + " >>>");
-        List<E> result = null;
+        List<E> result;
 
         try (Session session = driver.session()) {
             // Instantiate ReplacedParameterHandler Class
@@ -52,10 +52,9 @@ public class BaseCqlExecutor implements Executor {
 
             // Get SQL result
             result = resultSetHandler.handleResultSet(resultSet);
-
-            if (ms.getCommandType().equals("select") && result.size() == 0)
-                System.out.println("The result of SELECT is null");
         }
+        if (ms.getCommandType().equals("select") && result.size() == 0)
+            System.out.println("The result of SELECT is null");
         return result;
     }
 }

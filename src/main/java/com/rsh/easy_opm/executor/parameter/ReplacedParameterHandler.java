@@ -21,7 +21,7 @@ public class ReplacedParameterHandler implements ParameterHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Object setParameters(String paramType, List<String> paramOrder, Object[] parameter) throws SQLException {
+    public Object setParameters(String paramType, List<String> paramOrder, Object[] parameter){
         // when paramOrder is null, there is no replaced params
         if (paramOrder == null)
             return queryStr;

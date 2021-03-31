@@ -40,8 +40,8 @@ public class MapperBuilder {
         // find all resultMap nodes in mapper
         ResultMapBuilder resultMapBuilder = new ResultMapBuilder(rootNode, aliasMap);
 
-        for (SqlCommandType cur :
-                SqlCommandType.values()) {
+        for (QueryCommandType cur :
+                QueryCommandType.values()) {
             String commandType = cur.name().toLowerCase(Locale.ROOT);
 
             List<Element> commands = rootNode.elements(commandType);
@@ -49,11 +49,15 @@ public class MapperBuilder {
                 String id = element.attributeValue("id");
                 String sourceId = namespace + '.' + id;
                 String resultType = element.attributeValue("resultType");
-                String sql = element.getText();
+                String queryStr = element.getText().trim();
                 String resultMap = element.attributeValue("resultMap");
 
+                // trim empty char in query string
+                if (queryStr.charAt(0) == '\n')
+                    queryStr = queryStr.substring(1);
+
                 // resultType Attr is necessary in Select Node
-                if (cur.equals(SqlCommandType.SELECT))
+                if (cur.equals(QueryCommandType.SELECT))
                     AssertError.notFoundError(resultType != null, "resultType", "Select Node in " + path);
 
                 // build MappedStatement Class to store mapper info
@@ -66,11 +70,11 @@ public class MapperBuilder {
                     mappedStatement.setCollectionId(resultMapBuilder.getCollectionId(resultMap));
                 }
 
-                // parse Prepared Params #{...} in SQL
-                List<String> preparedParamOrder = parsePreparedParams(sql);
+                // parse Prepared Params #{...} in query sentence
+                List<String> preparedParamOrder = parsePreparedParams(queryStr);
 
-                // parse Replaced Params ${...} in SQL
-                List<String> replacedParamOrder = parseReplacedParams(sql);
+                // parse Replaced Params ${...} in query sentence
+                List<String> replacedParamOrder = parseReplacedParams(queryStr);
                 String paraType = element.attributeValue("parameterType");
 
                 // set result type alias according to typeAlias Properties
@@ -87,7 +91,7 @@ public class MapperBuilder {
                 mappedStatement.setReplacedParamOrder(replacedParamOrder);
                 mappedStatement.setNamespace(namespace);
                 mappedStatement.setSourceId(sourceId);
-                mappedStatement.setQueryStr(sql);
+                mappedStatement.setQueryStr(queryStr);
                 mappedStatement.setCommandType(commandType);
 
                 mappedStatement.checkMapperInfo();
@@ -99,18 +103,18 @@ public class MapperBuilder {
         return mapInfo;
     }
 
-    public static List<String> parsePreparedParams(String sql) {
-        return parseParams(sql, "#\\{([^#{}]*)}");
+    public static List<String> parsePreparedParams(String queryStr) {
+        return parseParams(queryStr, "#\\{([^#{}]*)}");
     }
 
-    public static List<String> parseReplacedParams(String sql) {
-        return parseParams(sql, "\\$\\{([^${}]*)}");
+    public static List<String> parseReplacedParams(String queryStr) {
+        return parseParams(queryStr, "\\$\\{([^${}]*)}");
     }
 
-    private static List<String> parseParams(String sql, String pattern){
+    private static List<String> parseParams(String queryStr, String pattern){
         List<String> paraOrder = new ArrayList<>();
         Pattern r = Pattern.compile(pattern);
-        Matcher m = r.matcher(sql);
+        Matcher m = r.matcher(queryStr);
         while (m.find()) {
             paraOrder.add(m.group(1));
         }

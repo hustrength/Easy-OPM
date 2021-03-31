@@ -5,9 +5,8 @@ import com.rsh.easy_opm.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@Mapper
 @ResultMap(id = "ResultUser",
-        idNode = @ResultsId(column = "id", property = "id"),
+        idNode = @Result(column = "id", property = "id"),
         result = {
                 @Result(column = "nick_name", property = "nickName"),
                 @Result(column = "real_name", property = "realName")

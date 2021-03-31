@@ -1,13 +1,11 @@
 package com.rsh.easy_opm;
 
-import com.rsh.easy_opm.sqlsession.BasicSession;
 import com.rsh.easy_opm.sqlsession.DefaultSession;
 import com.rsh.easy_opm.sqlsession.SessionFactory;
 import com.rsh.easy_opm.json.JsonMapper;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.List;
 
 public class TestEasy_OPM {
 
@@ -24,24 +22,9 @@ public class TestEasy_OPM {
         PersonMapper personMapper = cqlSession.getMapper(PersonMapper.class);
 
         Person result = personMapper.queryPersonByName("John");
-
-        if (result != null) {
-            System.out.println("\nBasicInfo:");
-            System.out.println(result);
-
-            System.out.println("\nFriends:");
-            List<Friendship> friends = result.getFriends();
-            for (Friendship friend :
-                    friends) {
-                System.out.println(friend);
-            }
-
-            System.out.println("\nSpouse:");
-            System.out.println(result.getSpouse());
-
-            System.out.println("\nBornInfo:");
-            System.out.println(result.getBornInfo());
-        }
+//        result.printInfo();
+        Person person = jsonMappingTest(result, "output/person_output.txt");
+        person.printInfo();
     }
 
     private void rdMapping(){
@@ -57,10 +40,12 @@ public class TestEasy_OPM {
         if (result != null)
             System.out.println(result.toString());
 
-        jsonMapping(result);
+        User user= jsonMappingTest(result, "output/user_output.txt");
+        System.out.println(user);
     }
 
-    private void jsonMapping(Object result){
+    @SuppressWarnings("unchecked")
+    private <T> T jsonMappingTest(T result, String path){
         JsonMapper jsonMapper = new JsonMapper();
         JsonMapper.setIndentOn(true);
 //        JsonMapper.setOverideOn(true);
@@ -68,11 +53,11 @@ public class TestEasy_OPM {
         System.out.println("\nMy POJ to json mapper:");
         System.out.println(jsonMapper.writeValueAsString(result));
 
-        jsonMapper.writeValueAsFile(new File("output/Json_output.txt"), result);
+        jsonMapper.writeValueAsFile(new File(path), result);
 
-        User jsonResult = jsonMapper.readValueFromFile(new File("output/Json_output.txt"), User.class);
+        T jsonResult = (T) jsonMapper.readValueFromFile(new File(path), result.getClass());
         System.out.println("\nMy json to POJ mapper:");
-        System.out.println(jsonResult);
+        return jsonResult;
     }
 }
 

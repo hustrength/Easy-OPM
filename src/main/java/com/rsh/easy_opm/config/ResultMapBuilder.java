@@ -45,9 +45,12 @@ public class ResultMapBuilder {
 
 
             // parse id node
-            // only the 1st Id node will be parsed
             List<Element> idNodes = resultMapNode.elements("id");
-            if (idNodes.size() == 1) {
+            if (idNodes.size() > 0) {
+                // only the 1st Id node will be parsed
+                if (idNodes.size() > 1)
+                    AssertError.warning("Only the 1st Id node will be parsed");
+
                 Element idNode = idNodes.get(0);
                 String idColumn = idNode.attributeValue("column");
                 String idProperty = idNode.attributeValue("property");
@@ -56,8 +59,6 @@ public class ResultMapBuilder {
                 // only when collection node exists, assign the collectionId
                 if (resultMapNode.element("collection") != null)
                     collectionIds.put(id, idProperty);
-            } else if (idNodes.size() > 1) {
-                AssertError.warning("Only the 1st Id node will be parsed");
             }
 
             // parse result node

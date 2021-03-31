@@ -19,6 +19,7 @@ public abstract class DefaultSession implements BasicSession{
         return config.getMapper(type, this);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T selectOne(String sourceID, Object[] parameter) {
         List<Object> selectList = this.selectList(sourceID, parameter);
         if (selectList != null && selectList.size() > 0) {
@@ -27,6 +28,7 @@ public abstract class DefaultSession implements BasicSession{
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public <E> List<E> selectList(String sourceID, Object[] parameter) {
         MappedStatement mappedStatement = config.queryMappedStatement(sourceID);
         AssertError.notMatchedError(mappedStatement != null, "Mapper source id", sourceID);

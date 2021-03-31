@@ -1,7 +1,6 @@
 package com.rsh.easy_opm.config;
 
 import com.rsh.easy_opm.binding.MapperProxyFactory;
-import com.rsh.easy_opm.error.AssertError;
 import com.rsh.easy_opm.sqlsession.DefaultSession;
 
 import java.util.HashMap;
@@ -30,13 +29,6 @@ public class Configuration {
 
     public MappedStatement queryMappedStatement(String sourceID) {
         return mappedStatements.get(sourceID);
-    }
-
-    public void checkDbConfig() {
-        AssertError.notFoundError(dbDriver != null, "dbDriver", Configuration.EASYOPM_CONFIG_PATH);
-        AssertError.notFoundError(dbUrl != null, "dbUrl", Configuration.EASYOPM_CONFIG_PATH);
-        AssertError.notFoundError(dbUserName != null, "dbUserName", Configuration.EASYOPM_CONFIG_PATH);
-        AssertError.notFoundError(dbPassword != null, "dbPassword", Configuration.EASYOPM_CONFIG_PATH);
     }
 
     @Override
