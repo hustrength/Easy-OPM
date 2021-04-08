@@ -17,7 +17,7 @@ public class Configuration {
     private String dbDriver;
 
     /* constant */
-    public static final String EASYOPM_CONFIG_PATH = "easy-opm.xml";
+    public static final String DEFAULT_CONFIG_PATH = "easy-opm.xml";
 
     // store mapper info
     private final Map<String, MappedStatement> mappedStatements = new HashMap<>();

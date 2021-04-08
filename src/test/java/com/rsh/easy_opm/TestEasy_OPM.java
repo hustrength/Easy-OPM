@@ -11,7 +11,7 @@ public class TestEasy_OPM {
 
     @Test
     public void test() {
-        gdMapping();
+        rdMapping();
 
     }
 

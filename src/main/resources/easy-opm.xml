@@ -3,8 +3,8 @@
     <properties resource="db.properties"/>
 
     <!-- set a default connection -->
-    <environments default="neo4j_developer">
-<!--    <environments default="mysql_developer">-->
+<!--    <environments default="neo4j_developer">-->
+    <environments default="mysql_developer">
     <!-- an optional connection configuration -->
         <environment id="mysql_developer">
             <dataSource>
