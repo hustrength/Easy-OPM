@@ -44,7 +44,7 @@ public interface UserMapper {
             "values (#{id}, #{nickName}, #{realName}, #{sex}, #{age});")
     @ParamType(User.class)
     @ResultMapId("ResultUser")
-    void insertOne(User user);
+    boolean insertOne(User user);
 
     /**
      * 4. Delete a User by primary key
@@ -54,7 +54,7 @@ public interface UserMapper {
     @Delete("delete from user " +
             "where id=#{id};")
     @ParamType(Integer.class)
-    void deleteByPrimaryKey(int id);
+    boolean deleteByPrimaryKey(int id);
 
     /**
      * 5. Update a User
@@ -65,7 +65,7 @@ public interface UserMapper {
             "set nick_name=#{nickName}, age=#{age}\n" +
             "where id=#{id}")
     @ParamType(User.class)
-    void updateOne(User user);
+    boolean updateOne(User user);
 
     /**
      * 6. Select Users by some conditions
