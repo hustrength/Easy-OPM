@@ -8,6 +8,7 @@ import com.rsh.easy_opm.error.AssertError;
 import com.rsh.easy_opm.sqlsession.DefaultSession;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Collection;
@@ -31,15 +32,19 @@ public class MapperProxy<T> implements InvocationHandler {
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args){
 
         // do not enhance the method if this is Object Class
         if (Object.class.equals(method.getDeclaringClass())) {
-            return method.invoke(this, args);
+            try {
+                return method.invoke(this, args);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         Class<?> returnType = method.getReturnType();
-        Object ret;
+        Object ret = null;
 
         // invoke different methods in BasicSession according to different return types
         String sourceID = mapperInterface.getName() + "." + method.getName();
@@ -50,14 +55,25 @@ public class MapperProxy<T> implements InvocationHandler {
 
             config.getMappedStatements().put(sourceID, ms);
         }
-
-        if (isCollection(returnType)) {
-            ret = session.selectList(sourceID, args);
-        } else {
-            ret = session.selectOne(sourceID, args);
+        try {
+            if (isCollection(returnType)) {
+                ret = session.selectList(sourceID, args);
+            } else {
+                ret = session.selectOne(sourceID, args);
+            }
+        }catch (Exception e){
+            System.out.println("Fail to execute " + method.getName());
+            if (isBoolean(returnType))
+                ret = false;
+            e.printStackTrace();
         }
-
+        if (isBoolean(returnType))
+            ret = true;
         return ret;
+    }
+
+    private boolean isBoolean(Class<?> type) {
+        return Boolean.class.isAssignableFrom(type);
     }
 
     private boolean isCollection(Class<?> type) {

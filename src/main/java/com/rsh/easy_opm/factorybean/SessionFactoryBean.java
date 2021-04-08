@@ -6,9 +6,14 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 
+
 public class SessionFactoryBean implements FactoryBean<SessionFactory>, InitializingBean {
     private SessionFactory sessionFactory;
     private Resource configLocation;
+
+    public void setConfigLocation(Resource configLocation) {
+        this.configLocation = configLocation;
+    }
 
     @Override
     public boolean isSingleton() {

@@ -11,6 +11,18 @@ public class MapperFactoryBean<T> implements FactoryBean<T> {
     private Class<T> mapperInterface;
     private SessionFactory.DB_TYPE db_type;
 
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
+    public void setMapperInterface(Class<T> mapperInterface) {
+        this.mapperInterface = mapperInterface;
+    }
+
+    public void setDb_type(SessionFactory.DB_TYPE db_type) {
+        this.db_type = db_type;
+    }
+
     public DefaultSession getSession() {
         AssertError.notFoundError(db_type != null, "Member db_type", "MapperFactoryBean");
         AssertError.notFoundError(sessionFactory != null, "Member sessionFactory", "MapperFactoryBean");

@@ -7,7 +7,7 @@ import com.rsh.easy_opm.executor.Executor;
 
 import java.util.List;
 
-public abstract class DefaultSession implements BasicSession{
+public abstract class DefaultSession implements BasicSession {
     Configuration config;
 
     Executor executor;
@@ -20,7 +20,7 @@ public abstract class DefaultSession implements BasicSession{
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T selectOne(String sourceID, Object[] parameter) {
+    public <T> T selectOne(String sourceID, Object[] parameter) throws Exception {
         List<Object> selectList = this.selectList(sourceID, parameter);
         if (selectList != null && selectList.size() > 0) {
             return (T) selectList.get(0);
@@ -29,15 +29,10 @@ public abstract class DefaultSession implements BasicSession{
     }
 
     @SuppressWarnings("unchecked")
-    public <E> List<E> selectList(String sourceID, Object[] parameter) {
+    public <E> List<E> selectList(String sourceID, Object[] parameter) throws Exception {
         MappedStatement mappedStatement = config.queryMappedStatement(sourceID);
         AssertError.notMatchedError(mappedStatement != null, "Mapper source id", sourceID);
-        try {
-            return executor.query(mappedStatement, parameter, (Class<E>) mapperInterface);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return executor.query(mappedStatement, parameter, (Class<E>) mapperInterface);
     }
 
     public Configuration getConfig() {
