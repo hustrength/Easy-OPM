@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DefaultStatementHandler implements StatementHandler{
+public class DefaultStatementHandler implements StatementHandler {
     private final MappedStatement mappedStatment;
 
     public DefaultStatementHandler(MappedStatement mappedStatment) {
@@ -21,22 +21,18 @@ public class DefaultStatementHandler implements StatementHandler{
     }
 
     @Override
-    public ResultSet execute(PreparedStatement statement) {
-        try {
-            String commandType = mappedStatment.getCommandType();
-            switch (commandType){
-                case "select":
-                    return statement.executeQuery();
-                case "update":
-                case "insert":
-                case "delete":
-                    statement.executeUpdate();
-                    return null;
-                default:
-                    AssertError.notSupported("Operation", commandType);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public ResultSet execute(PreparedStatement statement) throws SQLException {
+        String commandType = mappedStatment.getCommandType();
+        switch (commandType) {
+            case "select":
+                return statement.executeQuery();
+            case "update":
+            case "insert":
+            case "delete":
+                statement.executeUpdate();
+                return null;
+            default:
+                AssertError.notSupported("Operation", commandType);
         }
         return null;
     }

@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Collection;
 
 public class MapperProxy<T> implements InvocationHandler {
@@ -61,10 +62,14 @@ public class MapperProxy<T> implements InvocationHandler {
             } else {
                 ret = session.selectOne(sourceID, args);
             }
-        }catch (Exception e){
+        }catch (SQLIntegrityConstraintViolationException e){
+            System.out.println("Duplicated primary key, so fail to execute " + method.getName());
+            if (isBoolean(returnType))
+                return false;
+        } catch (Exception e){
             System.out.println("Fail to execute " + method.getName());
             if (isBoolean(returnType))
-                ret = false;
+                return false;
             e.printStackTrace();
         }
         if (isBoolean(returnType))
@@ -73,7 +78,7 @@ public class MapperProxy<T> implements InvocationHandler {
     }
 
     private boolean isBoolean(Class<?> type) {
-        return Boolean.class.isAssignableFrom(type);
+        return Boolean.class == type || boolean.class == type;
     }
 
     private boolean isCollection(Class<?> type) {
@@ -90,8 +95,8 @@ public class MapperProxy<T> implements InvocationHandler {
             AssertError.notFoundError(existQuery, "XML or Annotation Mapper settings both", method.toString());
             return true;
         } else {
-            if (existQuery)
-                AssertError.warning("For Method[" + method.toString() + "],\n\t\t" + "XML and Annotation Mapper are both set. Use XML Mapper in priority");
+//            if (existQuery)
+//                AssertError.warning("For Method[" + method.toString() + "],\n\t\t" + "XML and Annotation Mapper are both set. Use XML Mapper in priority");
             return false;
         }
     }

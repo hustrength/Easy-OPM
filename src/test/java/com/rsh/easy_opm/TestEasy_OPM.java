@@ -11,8 +11,9 @@ public class TestEasy_OPM {
 
     @Test
     public void test() {
+        Boolean a = false;
+        System.out.println(a.getClass());
         rdMapping();
-
     }
 
     private void gdMapping(){
