@@ -8,11 +8,12 @@ import com.rsh.easy_opm.error.AssertError;
 import com.rsh.easy_opm.sqlsession.DefaultSession;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.Collection;
+
+import static com.rsh.easy_opm.typecheck.TypeCheck.isBoolean;
+import static com.rsh.easy_opm.typecheck.TypeCheck.isCollection;
 
 public class MapperProxy<T> implements InvocationHandler {
 
@@ -75,14 +76,6 @@ public class MapperProxy<T> implements InvocationHandler {
         if (isBoolean(returnType))
             ret = true;
         return ret;
-    }
-
-    private boolean isBoolean(Class<?> type) {
-        return Boolean.class == type || boolean.class == type;
-    }
-
-    private boolean isCollection(Class<?> type) {
-        return Collection.class.isAssignableFrom(type);
     }
 
     private boolean existAnnotationSetting(String sourceID, Method method) {

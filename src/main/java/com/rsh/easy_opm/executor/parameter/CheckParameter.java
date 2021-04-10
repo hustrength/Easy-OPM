@@ -14,7 +14,8 @@ public class CheckParameter {
 
     public static void checkBasic(Object[] parameter){
         // judge if Para1 is Number Type or String Type
-        boolean paramTypeMatched = parameter.length == 1 && (parameter[0] instanceof Number || parameter[0] instanceof String || parameter[0] instanceof Date);
+        boolean paramTypeMatched = parameter.length == 1 && (parameter[0] instanceof Number || parameter[0] instanceof String
+                || parameter[0] instanceof Date || parameter[0] instanceof Boolean || parameter[0] instanceof Character);
         AssertError.notMatchedError(paramTypeMatched, "Para", parameter[0].getClass().getSimpleName(), "paraType", "basic");
     }
 }

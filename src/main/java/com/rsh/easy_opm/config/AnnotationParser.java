@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.rsh.easy_opm.typecheck.TypeCheck.isBasicType;
+
 public class AnnotationParser {
     private final Map<String, Map<String, String>> resultMaps = new HashMap<>();
     private final Class<?> mapperInterface;
@@ -155,9 +157,7 @@ public class AnnotationParser {
         if (method.isAnnotationPresent(ParamType.class)) {
             ParamType type = method.getAnnotation(ParamType.class);
             Class<?> typeValue = type.value();
-            if (Number.class.isAssignableFrom(typeValue) || String.class.isAssignableFrom(typeValue)
-                    || Date.class.isAssignableFrom(typeValue) || Boolean.class.isAssignableFrom(typeValue)
-                    || Character.class.isAssignableFrom(typeValue)) {
+            if (isBasicType(typeValue)) {
                 paramType = "basic";
             } else if (typeValue.isAssignableFrom(Map.class)) {
                 paramType = "map";

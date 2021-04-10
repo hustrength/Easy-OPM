@@ -11,8 +11,8 @@ public class TestEasy_OPM {
 
     @Test
     public void test() {
-        Boolean a = false;
-        System.out.println(a.getClass());
+        boolean a = false;
+        System.out.println(Boolean.class.isAssignableFrom(boolean.class));
         rdMapping();
     }
 
