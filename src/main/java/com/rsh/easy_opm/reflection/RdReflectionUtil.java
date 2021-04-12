@@ -158,20 +158,22 @@ public class RdReflectionUtil extends ReflectionUtil{
                 }
                 break;
             default:
-                // when the field type is the child class of Collection, set Collection Class to the field
-                if (List.class.isAssignableFrom(field.getType())) {
-                    Object entityValue = setEntity(unionOfType, result);
-                    List<Object> entityList = new ArrayList<>();
-                    if (entityValue != null) {
-                        haveSet = true;
-                        entityList.add(entityValue);
-                        field.set(entity, entityList);
-                    }
-                } else {
-                    T entityValue = setEntity(field.getType().getName(), result);
-                    if (entityValue != null) {
-                        haveSet = true;
-                        field.set(entity, entityValue);
+                if (unionOfType != null) {
+                    // when the field type is the child class of Collection, set Collection Class to the field
+                    if (List.class.isAssignableFrom(field.getType())) {
+                        Object entityValue = setEntity(unionOfType, result);
+                        List<Object> entityList = new ArrayList<>();
+                        if (entityValue != null) {
+                            haveSet = true;
+                            entityList.add(entityValue);
+                            field.set(entity, entityList);
+                        }
+                    } else {
+                        T entityValue = setEntity(field.getType().getName(), result);
+                        if (entityValue != null) {
+                            haveSet = true;
+                            field.set(entity, entityValue);
+                        }
                     }
                 }
         }

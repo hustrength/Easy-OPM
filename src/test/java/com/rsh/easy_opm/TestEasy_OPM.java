@@ -6,14 +6,22 @@ import com.rsh.easy_opm.json.JsonMapper;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.List;
 
 public class TestEasy_OPM {
 
     @Test
     public void test() {
-        boolean a = false;
-        System.out.println(Boolean.class.isAssignableFrom(boolean.class));
-        rdMapping();
+//        rdMapping();
+        otherRdTest();
+    }
+
+    private void otherRdTest(){
+        SessionFactory factory = new SessionFactory();
+        DefaultSession sqlSession = factory.getSession(SessionFactory.DB_TYPE.RD);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        List<User> result = userMapper.selectAll();
+        System.out.println(result);
     }
 
     private void gdMapping(){

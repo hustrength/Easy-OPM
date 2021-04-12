@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-public class SqlPreparedParameter extends PreparedParameterHandler{
+public class SqlPreparedParameter extends PreparedParameterHandler {
     private final PreparedStatement preparedStatement;
 
     public SqlPreparedParameter(PreparedStatement preparedStatement) {
@@ -18,6 +18,8 @@ public class SqlPreparedParameter extends PreparedParameterHandler{
     }
 
     private void setMappedParam(PreparedStatement preparedStatement, Object[] param) throws SQLException {
+        if (param == null)
+            return;
         for (int i = 0; i < param.length; i++) {
             if (param[i] instanceof Integer) {
                 preparedStatement.setInt(i + 1, (int) param[i]);

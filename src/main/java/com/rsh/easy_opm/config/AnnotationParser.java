@@ -229,6 +229,8 @@ public class AnnotationParser {
     }
 
     private String setEmptyStrToNull(String str) {
+        if (str == null)
+            return null;
         if (str.isEmpty())
             return null;
         return str;
