@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class RdReflectionUtil extends ReflectionUtil{
+public class RdReflectionUtil extends ReflectionUtil {
 
     public RdReflectionUtil(String resultType, String unionOfType, Map<String, String> resultMap) {
         this.resultType = resultType;
@@ -34,37 +34,40 @@ public class RdReflectionUtil extends ReflectionUtil{
         return entityNotNull ? entity : null;
     }
 
-    Object convertToBasicBean(String type, Object result) throws SQLException{
+    Object convertToBasicBean(String type, Object result) throws SQLException {
+        if (type == null)
+            return null;
         ResultSet resultSet = (ResultSet) result;
-        switch (type){
+
+        switch (type) {
             case "String":
-                return resultSet.getString(0);
+                return resultSet.getString(1);
             case "Integer":
             case "int":
-                return resultSet.getInt(0);
+                return resultSet.getInt(1);
             case "Boolean":
             case "boolean":
-                return resultSet.getBoolean(0);
+                return resultSet.getBoolean(1);
             case "Float":
             case "float":
-                return resultSet.getFloat(0);
+                return resultSet.getFloat(1);
             case "Character":
             case "char":
-                return resultSet.getString(0).charAt(0);
+                return resultSet.getString(1).charAt(0);
             case "Byte":
             case "byte":
-                return resultSet.getByte(0);
+                return resultSet.getByte(1);
             case "Short":
             case "short":
-                return resultSet.getShort(0);
+                return resultSet.getShort(1);
             case "Long":
             case "long":
-                return resultSet.getLong(0);
+                return resultSet.getLong(1);
             case "Double":
             case "double":
-                return resultSet.getDouble(0);
+                return resultSet.getDouble(1);
             case "Date":
-                return resultSet.getDate(0);
+                return resultSet.getDate(1);
             default:
                 return null;
         }
@@ -81,7 +84,8 @@ public class RdReflectionUtil extends ReflectionUtil{
         }
         return false;
     }
-    <T> boolean setField(Field field, String mappedName, T entity, Object result) throws Exception{
+
+    <T> boolean setField(Field field, String mappedName, T entity, Object result) throws Exception {
         ResultSet resultSet = (ResultSet) result;
         field.setAccessible(true);
 

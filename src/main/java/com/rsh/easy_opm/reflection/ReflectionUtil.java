@@ -28,9 +28,20 @@ public abstract class ReflectionUtil implements Reflection {
         try {
             // clear the records of entities iteration
             classIterateNum.clear();
-            Object basicType = convertToBasicBean(resultType, result);
-            if (basicType != null)
-                return basicType;
+
+            // fetch the simple name of type
+            int lastDotPos = -1;
+            for (int i = 0; i < resultType.length(); i++){
+                if (resultType.charAt(i) == '.')
+                    lastDotPos = i;
+            }
+            if (lastDotPos + 1 > resultType.length())
+                return null;
+            String simpleTypeName = resultType.substring(lastDotPos + 1);
+
+            Object basicTypeResult = convertToBasicBean(simpleTypeName, result);
+            if (basicTypeResult != null)
+                return basicTypeResult;
 
             return convertToEntityBean(result);
         } catch (Exception e) {

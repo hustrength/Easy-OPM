@@ -53,7 +53,10 @@ public class GdReflectionUtil extends ReflectionUtil {
     }
 
     Object convertToBasicBean(String type, Object result) {
+        if (type == null)
+            return null;
         Record record = (Record) result;
+
         switch (type) {
             case "String":
             case "Date":
@@ -121,9 +124,9 @@ public class GdReflectionUtil extends ReflectionUtil {
             case "Integer":
             case "int":
                 // for symbol "$id", set the identity of entity
-                if (mappedName.equals("$id")){
+                if (mappedName.equals("$id")) {
                     haveSet = true;
-                    field.set(entity, (int)((Entity) result).id());
+                    field.set(entity, (int) ((Entity) result).id());
                     break;
                 }
 
@@ -180,7 +183,7 @@ public class GdReflectionUtil extends ReflectionUtil {
             case "Long":
             case "long":
                 // for symbol "$id", set the identity of entity
-                if (mappedName.equals("$id")){
+                if (mappedName.equals("$id")) {
                     haveSet = true;
                     field.set(entity, ((Entity) result).id());
                     break;

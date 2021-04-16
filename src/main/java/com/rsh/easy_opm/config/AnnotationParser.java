@@ -4,7 +4,6 @@ import com.rsh.easy_opm.annotation.*;
 import com.rsh.easy_opm.error.AssertError;
 
 import java.lang.reflect.Method;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -165,9 +164,16 @@ public class AnnotationParser {
                 paramType = typeValue.getName();
             }
         }
+
+        if (method.isAnnotationPresent(ResultType.class)) {
+            ResultType resultType = method.getAnnotation(ResultType.class);
+            ms.setResultType(resultType.value().getName());
+            foundAnnotation = true;
+        }
+
         if (method.isAnnotationPresent(Select.class)) {
             // @resultType Attr is necessary in @select
-            AssertError.notFoundError(method.isAnnotationPresent(ResultType.class), "resultType", "Select Node in " + mapperInterface.getName());
+            AssertError.notFoundError(ms.getResultType() != null, "resultType", "Select Node in " + mapperInterface.getName());
 
             Select select = method.getAnnotation(Select.class);
             parseQueryStr(ms, select.value(), paramType, "select");
@@ -189,12 +195,6 @@ public class AnnotationParser {
         if (method.isAnnotationPresent(Update.class)) {
             Update update = method.getAnnotation(Update.class);
             parseQueryStr(ms, update.value(), paramType, "update");
-            foundAnnotation = true;
-        }
-
-        if (method.isAnnotationPresent(ResultType.class)) {
-            ResultType resultType = method.getAnnotation(ResultType.class);
-            ms.setResultType(resultType.value().getName());
             foundAnnotation = true;
         }
 

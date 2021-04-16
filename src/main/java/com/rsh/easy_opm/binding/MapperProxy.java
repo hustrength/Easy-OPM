@@ -34,7 +34,7 @@ public class MapperProxy<T> implements InvocationHandler {
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args){
+    public Object invoke(Object proxy, Method method, Object[] args) {
 
         // do not enhance the method if this is Object Class
         if (Object.class.equals(method.getDeclaringClass())) {
@@ -57,17 +57,18 @@ public class MapperProxy<T> implements InvocationHandler {
 
             config.getMappedStatements().put(sourceID, ms);
         }
+
         try {
             if (isCollection(returnType)) {
                 ret = session.selectList(sourceID, args);
             } else {
                 ret = session.selectOne(sourceID, args);
             }
-        }catch (SQLIntegrityConstraintViolationException e){
+        } catch (SQLIntegrityConstraintViolationException e) {
             System.out.println("Duplicated primary key, so fail to execute " + method.getName());
             if (isBoolean(returnType))
                 return false;
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Fail to execute " + method.getName());
             if (isBoolean(returnType))
                 return false;

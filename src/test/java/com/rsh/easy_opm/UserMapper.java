@@ -82,4 +82,13 @@ public interface UserMapper {
     @ResultType(User.class)
     @ResultMapId("ResultUser")
     List<User> selectByConditions(Map<String, Object> map);
+
+    /**
+     * 7. if existing user
+     *
+     * @return Boolean
+     */
+    @Select("select exists(select * from user);")
+    @ResultType(Boolean.class)
+    Boolean existUser();
 }

@@ -20,8 +20,9 @@ public class TestEasy_OPM {
         SessionFactory factory = new SessionFactory();
         DefaultSession sqlSession = factory.getSession(SessionFactory.DB_TYPE.RD);
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
-        List<User> result = userMapper.selectAll();
-        System.out.println(result);
+//        List<User> result = userMapper.selectAll();
+//        System.out.println(result);
+        System.out.println(userMapper.existUser());
     }
 
     private void gdMapping(){
