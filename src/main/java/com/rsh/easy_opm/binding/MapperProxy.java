@@ -6,6 +6,7 @@ import com.rsh.easy_opm.config.Configuration;
 import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.error.AssertError;
 import com.rsh.easy_opm.sqlsession.DefaultSession;
+import com.rsh.easy_opm.typecheck.TypeCheck;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -46,6 +47,10 @@ public class MapperProxy<T> implements InvocationHandler {
         }
 
         Class<?> returnType = method.getReturnType();
+
+        // Check if the return type is encapsulated type. If not, throw error
+        TypeCheck.isBasicType(returnType);
+
         Object ret = null;
 
         // invoke different methods in BasicSession according to different return types
@@ -66,17 +71,23 @@ public class MapperProxy<T> implements InvocationHandler {
             }
         } catch (SQLIntegrityConstraintViolationException e) {
             System.out.println("Duplicated primary key, so fail to execute " + method.getName());
-            if (isBoolean(returnType))
+            if (isBoolean(returnType) && isNotSelect(method))
                 return false;
         } catch (Exception e) {
             System.out.println("Fail to execute " + method.getName());
-            if (isBoolean(returnType))
+            if (isBoolean(returnType) && isNotSelect(method))
                 return false;
             e.printStackTrace();
         }
-        if (isBoolean(returnType))
+        if (isBoolean(returnType) && isNotSelect(method))
             ret = true;
         return ret;
+    }
+
+    private boolean isNotSelect(Method method) {
+        return method.isAnnotationPresent(Update.class)
+                || method.isAnnotationPresent(Insert.class)
+                || method.isAnnotationPresent(Delete.class);
     }
 
     private boolean existAnnotationSetting(String sourceID, Method method) {

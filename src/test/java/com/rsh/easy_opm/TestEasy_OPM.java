@@ -22,7 +22,7 @@ public class TestEasy_OPM {
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
 //        List<User> result = userMapper.selectAll();
 //        System.out.println(result);
-        System.out.println(userMapper.existUser());
+        System.out.println(userMapper.queryAgeById(7));
     }
 
     private void gdMapping(){

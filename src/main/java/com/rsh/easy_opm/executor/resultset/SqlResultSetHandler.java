@@ -7,6 +7,7 @@ import com.rsh.easy_opm.reflection.ReflectionUtil;
 import com.rsh.easy_opm.sqlsession.DefaultSqlSession;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public class SqlResultSetHandler extends ResultSetHandler {
