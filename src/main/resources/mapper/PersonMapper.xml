@@ -8,7 +8,7 @@
 
     <resultMap id="PersonMapper">
 <!--    symbol "$id" marks the mapping identity of this entity itself  -->
-        <id column="@$id" property="id"/>
+        <id column="$id" property="id"/>
 <!--    the property "this" marks the mapping query result of this entity itself    -->
         <result column="x" property="this"/>
 <!--    prefix '@' marks the mapping column is a property of this entity itself   -->
@@ -23,14 +23,14 @@
     </resultMap>
 
     <resultMap id="SpouseInfoMapper">
-        <id column="@$id" property="id"/>
+        <id column="$id" property="id"/>
         <result column="x" property="this"/>
         <result column="@name" property="name"/>
         <result column="@age" property="age"/>
     </resultMap>
 
     <resultMap id="BornInfoMapper">
-        <id column="@$id" property="id"/>
+        <id column="$id" property="id"/>
         <result column="x" property="this"/>
         <result column="@name" property="name"/>
         <result column="y.year" property="bornYear"/>

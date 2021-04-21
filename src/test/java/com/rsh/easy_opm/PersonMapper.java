@@ -5,7 +5,7 @@ import com.rsh.easy_opm.annotation.*;
 import java.util.List;
 
 @ResultMap(id = "PersonMapper",
-        idNode = @Result(column = "@$id", property = "id"),
+        idNode = @Result(column = "$id", property = "id"),
         result = {
                 @Result(column = "x", property = "this"),
                 @Result(column = "@name", property = "name"),
@@ -19,14 +19,14 @@ import java.util.List;
                 @Association(property = "bornInfo", ofType = BornInfo.class,
                         select = "queryBornInfoByName", column = "name")})
 @ResultMap(id = "SpouseInfoMapper",
-        idNode = @Result(column = "@$id", property = "id"),
+        idNode = @Result(column = "$id", property = "id"),
         result = {
                 @Result(column = "x", property = "this"),
                 @Result(column = "@name", property = "name"),
                 @Result(column = "@age", property = "age")
         })
 @ResultMap(id = "BornInfoMapper",
-        idNode = @Result(column = "@$id", property = "id"),
+        idNode = @Result(column = "$id", property = "id"),
         result = {
                 @Result(column = "x", property = "this"),
                 @Result(column = "@name", property = "name"),
@@ -39,7 +39,7 @@ import java.util.List;
                         @Result(column = "city", property = "city"),
                         @Result(column = "state", property = "state")}))
 @ResultMap(id = "FriendshipInfo",
-        idNode = @Result(column = "@$id", property = "id"),
+        idNode = @Result(column = "$id", property = "id"),
         result = {
                 @Result(column = "x", property = "this"),
                 @Result(column = "@since", property = "beginningYear")

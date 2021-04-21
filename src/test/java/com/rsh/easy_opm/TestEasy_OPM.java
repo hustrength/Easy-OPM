@@ -6,14 +6,13 @@ import com.rsh.easy_opm.json.JsonMapper;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.List;
 
 public class TestEasy_OPM {
 
     @Test
     public void test() {
-//        rdMapping();
-        otherRdTest();
+        rdMapping();
+//        otherRdTest();
     }
 
     private void otherRdTest(){
@@ -58,7 +57,7 @@ public class TestEasy_OPM {
     private <T> T jsonMappingTest(T result, String path){
         JsonMapper jsonMapper = new JsonMapper();
         JsonMapper.setIndentOn(true);
-//        JsonMapper.setOverwriteOn(true);
+        JsonMapper.setOverwriteOn(true);
 
         System.out.println("\nMy POJ to json mapper:");
         System.out.println(jsonMapper.writeValueAsString(result));
