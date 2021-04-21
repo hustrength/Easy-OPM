@@ -7,10 +7,11 @@
     </typeAliases>
 
     <resultMap id="PersonMapper">
-<!--    symbol "$id" means the identity of a entity    -->
+<!--    symbol "$id" marks the mapping identity of this entity itself  -->
         <id column="@$id" property="id"/>
+<!--    the property "this" marks the mapping query result of this entity itself    -->
         <result column="x" property="this"/>
-<!--    prefix '@' means the column is a property of neo4j entity    -->
+<!--    prefix '@' marks the mapping column is a property of this entity itself   -->
         <result column="@name" property="name"/>
         <result column="@age" property="age"/>
         <collection property="friends" ofType="Friendship"

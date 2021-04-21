@@ -26,10 +26,10 @@
         </environment>
     </environments>
 
-    <!--    mapper file path-->
+    <!-- mapper file path -->
     <mappers>
-<!--        <mapper resource="mapper/UserMapper.xml"/>-->
-<!--        <mapper resource="mapper/User_WorkMapper.xml"/>-->
-<!--        <mapper resource="mapper/PersonMapper.xml"/>-->
+        <mapper resource="mapper/UserMapper.xml"/>
+        <mapper resource="mapper/User_WorkMapper.xml"/>
+        <mapper resource="mapper/PersonMapper.xml"/>
     </mappers>
 </configuration>
