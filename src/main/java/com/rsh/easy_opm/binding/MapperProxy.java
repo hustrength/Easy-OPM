@@ -57,7 +57,7 @@ public class MapperProxy<T> implements InvocationHandler {
         String sourceID = mapperInterface.getName() + "." + method.getName();
 
         // if using annotation to set mapper, generate MappedStatement from annotation
-        if (existAnnotationSetting(sourceID, method)) {
+        if (needToParseAnnotationSetting(sourceID, method)) {
             MappedStatement ms = annotationParser.parse(method);
 
             config.getMappedStatements().put(sourceID, ms);
@@ -90,7 +90,7 @@ public class MapperProxy<T> implements InvocationHandler {
                 || method.isAnnotationPresent(Delete.class);
     }
 
-    private boolean existAnnotationSetting(String sourceID, Method method) {
+    private boolean needToParseAnnotationSetting(String sourceID, Method method) {
         MappedStatement ms = config.queryMappedStatement(sourceID);
 
         boolean existQuery = method.isAnnotationPresent(Select.class) || method.isAnnotationPresent(Update.class)
@@ -99,7 +99,8 @@ public class MapperProxy<T> implements InvocationHandler {
         if (ms == null) {
             AssertError.notFoundError(existQuery, "XML or Annotation Mapper settings both", method.toString());
             return true;
-        } else {
+        } // when ms!=null, MappedStatement was parsed from XML or Annotation before
+        else {
 //            if (existQuery)
 //                AssertError.warning("For Method[" + method.toString() + "],\n\t\t" + "XML and Annotation Mapper are both set. Use XML Mapper in priority");
             return false;
