@@ -4,7 +4,7 @@ import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.executor.parameter.*;
 import com.rsh.easy_opm.executor.resultset.*;
 import com.rsh.easy_opm.executor.statement.*;
-import com.rsh.easy_opm.sqlsession.DefaultSqlSession;
+import com.rsh.easy_opm.session.DefaultSqlSession;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

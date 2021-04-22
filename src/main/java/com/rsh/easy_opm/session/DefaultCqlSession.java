@@ -1,4 +1,4 @@
-package com.rsh.easy_opm.sqlsession;
+package com.rsh.easy_opm.session;
 
 import com.rsh.easy_opm.config.Configuration;
 import com.rsh.easy_opm.executor.BaseCqlExecutor;

@@ -1,7 +1,7 @@
 package com.rsh.easy_opm.config;
 
 import com.rsh.easy_opm.binding.MapperProxyFactory;
-import com.rsh.easy_opm.sqlsession.DefaultSession;
+import com.rsh.easy_opm.session.DefaultSession;
 
 import java.util.HashMap;
 import java.util.Map;

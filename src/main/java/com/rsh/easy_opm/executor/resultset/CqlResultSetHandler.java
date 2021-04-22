@@ -5,7 +5,7 @@ import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.config.ResultMapUnion;
 import com.rsh.easy_opm.reflection.GdReflectionUtil;
 import com.rsh.easy_opm.reflection.ReflectionUtil;
-import com.rsh.easy_opm.sqlsession.DefaultCqlSession;
+import com.rsh.easy_opm.session.DefaultCqlSession;
 import org.neo4j.driver.Result;
 
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package com.rsh.easy_opm;
 
-import com.rsh.easy_opm.sqlsession.DefaultSession;
-import com.rsh.easy_opm.sqlsession.SessionFactory;
+import com.rsh.easy_opm.session.DefaultSession;
+import com.rsh.easy_opm.session.SessionFactory;
 import com.rsh.easy_opm.json.JsonMapper;
 import org.junit.Test;
 

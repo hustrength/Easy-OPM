@@ -3,7 +3,7 @@ package com.rsh.easy_opm.executor.resultset;
 import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.config.ResultMapUnion;
 import com.rsh.easy_opm.error.AssertError;
-import com.rsh.easy_opm.sqlsession.DefaultSession;
+import com.rsh.easy_opm.session.DefaultSession;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

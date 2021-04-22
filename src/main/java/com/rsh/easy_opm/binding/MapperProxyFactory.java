@@ -1,7 +1,6 @@
 package com.rsh.easy_opm.binding;
 
-import com.rsh.easy_opm.sqlsession.BasicSession;
-import com.rsh.easy_opm.sqlsession.DefaultSession;
+import com.rsh.easy_opm.session.DefaultSession;
 
 import java.lang.reflect.Proxy;
 

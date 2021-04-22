@@ -6,7 +6,7 @@ import com.rsh.easy_opm.executor.parameter.ParameterHandler;
 import com.rsh.easy_opm.executor.parameter.ReplacedParameterHandler;
 import com.rsh.easy_opm.executor.resultset.CqlResultSetHandler;
 import com.rsh.easy_opm.executor.resultset.ResultSetHandler;
-import com.rsh.easy_opm.sqlsession.DefaultCqlSession;
+import com.rsh.easy_opm.session.DefaultCqlSession;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Result;

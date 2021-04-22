@@ -4,10 +4,9 @@ import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.config.ResultMapUnion;
 import com.rsh.easy_opm.reflection.RdReflectionUtil;
 import com.rsh.easy_opm.reflection.ReflectionUtil;
-import com.rsh.easy_opm.sqlsession.DefaultSqlSession;
+import com.rsh.easy_opm.session.DefaultSqlSession;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 public class SqlResultSetHandler extends ResultSetHandler {

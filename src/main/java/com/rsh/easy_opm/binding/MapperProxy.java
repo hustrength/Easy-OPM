@@ -5,7 +5,7 @@ import com.rsh.easy_opm.config.AnnotationParser;
 import com.rsh.easy_opm.config.Configuration;
 import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.error.AssertError;
-import com.rsh.easy_opm.sqlsession.DefaultSession;
+import com.rsh.easy_opm.session.DefaultSession;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
