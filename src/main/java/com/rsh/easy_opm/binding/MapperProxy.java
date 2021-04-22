@@ -6,7 +6,6 @@ import com.rsh.easy_opm.config.Configuration;
 import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.error.AssertError;
 import com.rsh.easy_opm.sqlsession.DefaultSession;
-import com.rsh.easy_opm.typecheck.TypeCheck;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -46,12 +45,6 @@ public class MapperProxy<T> implements InvocationHandler {
             }
         }
 
-        Class<?> returnType = method.getReturnType();
-
-        // Check if the return type is encapsulated type. If not, throw error
-        TypeCheck.isBasicType(returnType);
-
-        Object ret = null;
 
         // invoke different methods in BasicSession according to different return types
         String sourceID = mapperInterface.getName() + "." + method.getName();
@@ -63,6 +56,8 @@ public class MapperProxy<T> implements InvocationHandler {
             config.getMappedStatements().put(sourceID, ms);
         }
 
+        Object ret = null;
+        Class<?> returnType = method.getReturnType();
         try {
             if (isCollection(returnType)) {
                 ret = session.selectList(sourceID, args);
