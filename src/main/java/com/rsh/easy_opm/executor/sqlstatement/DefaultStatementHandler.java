@@ -1,4 +1,4 @@
-package com.rsh.easy_opm.executor.statement;
+package com.rsh.easy_opm.executor.sqlstatement;
 
 import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.error.AssertError;

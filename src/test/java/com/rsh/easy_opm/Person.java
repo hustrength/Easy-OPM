@@ -64,12 +64,23 @@ public class Person {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", age=" + age +
+                ", friends=" + friends +
+                ", spouse=" + spouse +
+                ", bornInfo=" + bornInfo +
+                '}';
+    }
+
+    public String basicInfo() {
+        return "Person{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
                 '}';
     }
 
     public void printInfo() {
-        System.out.println("\nBasicInfo:");
-        System.out.println(this);
+        System.out.println("BasicInfo:");
+        System.out.println(basicInfo());
 
         System.out.println("\nFriends:");
         List<Friendship> friends = this.getFriends();

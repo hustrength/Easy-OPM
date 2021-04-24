@@ -3,7 +3,7 @@ package com.rsh.easy_opm.executor;
 import com.rsh.easy_opm.config.MappedStatement;
 import com.rsh.easy_opm.executor.parameter.*;
 import com.rsh.easy_opm.executor.resultset.*;
-import com.rsh.easy_opm.executor.statement.*;
+import com.rsh.easy_opm.executor.sqlstatement.*;
 import com.rsh.easy_opm.session.DefaultSqlSession;
 
 import java.sql.Connection;

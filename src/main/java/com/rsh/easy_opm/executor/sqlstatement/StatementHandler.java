@@ -1,4 +1,4 @@
-package com.rsh.easy_opm.executor.statement;
+package com.rsh.easy_opm.executor.sqlstatement;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
